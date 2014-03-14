@@ -13,11 +13,33 @@ PREFIX stats: <http://stats.270a.info/vocab#>
 PREFIX provenance: <", siteURI, "provenance/>
 ")
 
-sparqlUpdateGroupedBarPlot <- function(analysisURI, datasetX, datasetY, refArea, refPeriod, data, analysis) { # refPeriod & datasetY hinzugefügt
-    sparqlQueryStringEncoded <- URLencode(sparqlQueryStringGroupedBarPlot(datasetX, datasetY, refArea, refPeriod), reserved=TRUE) # refPeriod & datasetY hinzugefügt
+sparqlUpdateGroupedBarPlot <- function(analysisURI, dataset, refArea, refPeriod, data, analysis) { # refPeriod & datasetY hinzugefügt & datasetX zu dataset
+    sparqlQueryStringEncoded <- URLencode(sparqlQueryStringGroupedBarPlot(dataset, refArea, refPeriod), reserved=TRUE) # refPeriod & datasetY hinzugefügt & datasetX zu dataset
 
 #cat(paste0(data), file=stderr())
 #cat(data[,1], file=stderr())
+
+# GANZER BLOCK HINZUGEFÜGT FÜR VARIABLE ANZAHL DATASETS
+    d <- strsplit(c(d = dataset), ",") # teilt unterschiedliche Datasets in URL bei ","
+    if (length(d$d) == 1) {
+        t <- strsplit(c(t = d$d[1]), ":") # teilt 1. Dataset bei : um Prefix und Dataset zu erhalten
+        datasetX <- paste0(namespaces[t$t[1]], t$t[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS
+    }
+    else if (length(d$d) == 2) {
+        t <- strsplit(c(t = d$d[1]), ":") # teilt 1. Dataset bei : um Prefix und Dataset zu erhalten
+        datasetX <- paste0(namespaces[t$t[1]], t$t[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS
+        t <- strsplit(c(t = d$d[2]), ":") # teilt 2. Dataset bei : um Prefix und Dataset zu erhalten
+        datasetY <- paste0(namespaces[t$t[1]], t$t[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.SECO.PC.ZS
+    }
+    else if (length(d$d) == 3) {
+        t <- strsplit(c(t = d$d[1]), ":") # teilt 1. Dataset bei : um Prefix und Dataset zu erhalten
+        datasetX <- paste0(namespaces[t$t[1]], t$t[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS
+        t <- strsplit(c(t = d$d[2]), ":") # teilt 2. Dataset bei : um Prefix und Dataset zu erhalten
+        datasetY <- paste0(namespaces[t$t[1]], t$t[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.SECO.PC.ZS
+        t <- strsplit(c(t = d$d[3]), ":") # teilt 3. Dataset bei : um Prefix und Dataset zu erhalten
+        datasetZ <- paste0(namespaces[t$t[1]], t$t[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.TERT.PC.ZS
+    }
+# BLOCK ENDE
 
 #FIXME: xsd:decimal assignment is problematic because not all values are xsd:decimal!
     statsData <- paste0("<", analysisURI, ">")
@@ -46,7 +68,7 @@ sparqlUpdateGroupedBarPlot <- function(analysisURI, datasetX, datasetY, refArea,
 
     now <- strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ")
 
-    plotURI <- paste0(siteURI, "plots/", digest(paste0(datasetX, datasetY, refArea, refPeriod), algo="sha1", serialize=FALSE), ".svg") # refPeriod  & datasetY hinzugefügt
+    plotURI <- paste0(siteURI, "plots/", digest(paste0(dataset, refArea, refPeriod), algo="sha1", serialize=FALSE), ".svg") # refPeriod  & datasetY hinzugefügt & datasetX zu dataset
 
     sparqlQueryURI <- paste0("<", sparqlEndpoints$stats, "?query=", sparqlQueryStringEncoded, ">")
   
@@ -55,18 +77,44 @@ sparqlUpdateGroupedBarPlot <- function(analysisURI, datasetX, datasetY, refArea,
 INSERT DATA {
     GRAPH <http://stats.270a.info/graph/analysis> {
         ", sparqlQueryURI, "
-            rdfs:label \"SPARQL Query URI to retrieve the data for '", resourceLabels[datasetX], "' and '", resourceLabels[datasetY], "'\"@en .
+            # ZEILE rdfs:label GELÖSCHT UND ERSETZT -> datasetX usw. hinzufügen -> siehe früheren Code
+            # ersetzt
+            rdfs:label \"SPARQL Query URI to retrieve the data for \"@en . 
 
         provenance:", analysis$id, "
             a prov:Activity ;
-            rdfs:label \"Generated Analysis '", resourceLabels[datasetX], "' and '", resourceLabels[datasetY], "'\"@en ;
+            # ZEILE rdfs:label GELÖSCHT UND ERSETZT -> datasetX usw. hinzufügen -> siehe früheren Code
+            # ersetzt
+            rdfs:label \"Generated Analysis \"@en ;
 
             prov:startedAtTime \"", now, "\"^^xsd:dateTime ;
             prov:wasAssociatedWith <http://csarven.ca/#i> ;
             prov:used ", sparqlQueryURI, " ;
             prov:used <https://github.com/csarven/lsd-analysis> ;
-            prov:used <", datasetX, "> ;
-            prov:used <", datasetY, "> ; # datasetY hinzugefügt
+        ")
+        if (length(d$d) == 1)
+        {
+            query <- paste0(query, "
+                prov:used <", datasetX, "> ;
+            ")
+        }
+        else if (length(d$d) == 2)
+        {
+            query <- paste0(query, "
+                prov:used <", datasetX, "> ;
+                prov:used <", datasetY, "> ;
+            ")
+        }
+        else if (length(d$d) == 3)
+        {
+            query <- paste0(query, "
+                prov:used <", datasetX, "> ;
+                prov:used <", datasetY, "> ;
+                prov:used <", datasetZ, "> ;
+            ")
+        }
+        query <- paste0(query, "  
+            # datasetY GELÖSCHT -> gleich wie Zeile mit datasetX
             #prov:used <", refArea, "> ; # TODO: refArea entfernen
 
             prov:generated <", analysisURI, "> ;
@@ -76,7 +124,9 @@ INSERT DATA {
         <", analysisURI, ">
             a stats:Analysis ;
             a prov:Entity ;
-            rdfs:label \"Analysis of '", resourceLabels[datasetX], "' and '", resourceLabels[datasetY], "'\"@en ;
+            # ZEILE rdfs:label GELÖSCHT UND ERSETZT -> datasetX usw. hinzufügen -> siehe früheren Code
+            # ersetzt            
+            rdfs:label \"Analysis of \"@en ;
 
             prov:wasGeneratedBy provenance:", analysis$id, " ;
             prov:generatedAtTime \"", now, "\"^^xsd:dateTime ;
@@ -86,9 +136,30 @@ INSERT DATA {
             dcterms:license <", licenseURI, "> ;
 
             stats:graph <", plotURI ,"> ;
-
-            stats:datasetX <", datasetX, "> ;
-            stats:datasetX <", datasetY, "> ; # datasetY hinzugefügt
+        ")
+        if (length(d$d) == 1)
+        {
+            query <- paste0(query, "
+                stats:datasetX <", datasetX, "> ;
+            ")
+        }
+        else if (length(d$d) == 2)
+        {
+            query <- paste0(query, "
+                stats:datasetX <", datasetX, "> ;
+                stats:datasetY <", datasetY, "> ;
+            ")
+        }
+        else if (length(d$d) == 3)
+        {
+            query <- paste0(query, "
+                stats:datasetX <", datasetX, "> ;
+                stats:datasetY <", datasetY, "> ;
+                stats:datasetZ <", datasetZ, "> ;
+            ")
+        }
+        query <- paste0(query, "  
+            # datasetY GELÖSCHT -> gleich wie Zeile mit datasetX
             #stats:refArea <", refArea, "> ; # TODO: refArea entfernen
 
             stats:n \"", nrow(data), "\"^^xsd:integer
@@ -111,7 +182,7 @@ INSERT DATA {
 
 
 sparqlQueryGetAnalysisSummaryGroupedBarPlot <- function(analysisURI) {
-   
+
 
     q <- paste0("
 PREFIX stats: <http://stats.270a.info/vocab#>
@@ -120,8 +191,8 @@ SELECT *
 WHERE {
     GRAPH <http://stats.270a.info/graph/analysis> {
         <", analysisURI, ">
-            stats:datasetX ?datasetX ;
-            stats:datasetY ?datasetY ; # datasetY hinzugefügt
+            stats:dataset ?dataset ; # datasetX zu dataset
+            # datasetY GELÖSCHT -> gleich wie Zeile mit datasetX
             #stats:refArea ?refArea ; # TODO: refArea entfernen
             stats:graph ?graph ;
             stats:n ?n ;
@@ -137,26 +208,93 @@ WHERE {
 
 
 
-sparqlQueryGroupedBarPlot <- function(datasetX, datasetY, refArea, refPeriod) { # refPeriod & datasetY hinzugefügt
-    q <- sparqlQueryStringGroupedBarPlot(datasetX, datasetY, refArea, refPeriod) # refPeriod & datasetY hinzugefügt
+sparqlQueryGroupedBarPlot <- function(dataset, refArea, refPeriod) { # refPeriod & datasetY hinzugefügt & datasetX zu dataset
+    q <- sparqlQueryStringGroupedBarPlot(dataset, refArea, refPeriod) # refPeriod & datasetY hinzugefügt & datasetX zu dataset
     r <- SPARQL(sparqlEndpoints$stats, q)
     return(r$results)
 }
 
 # erhält Daten aus sQGroupedBarPlot(....) aus server.R
-sparqlQueryStringGroupedBarPlot <- function(datasetX, datasetY, refArea, refPeriod) { # refPeriod & datasetY hinzugefügt
-#XXX: Move this to config
-    datasetNameX <- gsub("http://([^.]*).270a.info/dataset/.*", "\\1", datasetX, perl=TRUE)
-    datasetNameY <- gsub("http://([^.]*).270a.info/dataset/.*", "\\1", datasetY, perl=TRUE) # datasetY hinzugefügt
-#print(datasetNameX)
+sparqlQueryStringGroupedBarPlot <- function(dataset, refArea, refPeriod) { # refPeriod & datasetY hinzugefügt & datasetX zu dataset
 
-    domainX <- gsub("http://([^/]*).*", "\\1", datasetX, perl=TRUE)
-    domainY <- gsub("http://([^/]*).*", "\\1", datasetY, perl=TRUE) # datasetY hinzugefügt
-#print(domainX)
+# GANZER BLOCK HINZUGEFÜGT FÜR VARIABLE ANZAHL DATASETS
+    d <- strsplit(c(d = dataset), ",") # teilt unterschiedliche Datasets in URL bei ","
+    # print(d$d[1]) # worldbank:SE.XPD.PRIM.PC.ZS
+    # print(d$d[2]) # worldbank:SE.XPD.SECO.PC.ZS
 
-    if (datasetNameX != datasetX && datasetNameY != datasetY) { # ganzer Block hinzugefügt (3 Zeilen & obere 2 Zeilen auskommentiert)
+    if (length(d$d) == 1) {
+        t <- strsplit(c(t = d$d[1]), ":") # teilt 1. Dataset bei : um Prefix und Dataset zu erhalten
+        datasetX <- paste0(namespaces[t$t[1]], t$t[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS
+        print(paste0("datasetX = ", datasetX))
+
+        datasetNameX <- gsub("http://([^.]*).270a.info/dataset/.*", "\\1", datasetX, perl=TRUE)
+        domainX <- gsub("http://([^/]*).*", "\\1", datasetX, perl=TRUE)
+        # TODO: Teil später löschen, da Abfrage benötigt -> weiter unten
+        # if (datasetNameX != datasetX) {
+        endpointX <- sparqlEndpoints[datasetNameX]
+    }
+    else if (length(d$d) == 2) {
+        t <- strsplit(c(t = d$d[1]), ":") # teilt 1. Dataset bei : um Prefix und Dataset zu erhalten
+        datasetX <- paste0(namespaces[t$t[1]], t$t[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS
+        print(paste0("datasetX = ", datasetX))
+        t <- strsplit(c(t = d$d[2]), ":") # teilt 2. Dataset bei : um Prefix und Dataset zu erhalten
+        datasetY <- paste0(namespaces[t$t[1]], t$t[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.SECO.PC.ZS
+        print(paste0("datasetY = ", datasetY))
+
+        datasetNameX <- gsub("http://([^.]*).270a.info/dataset/.*", "\\1", datasetX, perl=TRUE)
+        datasetNameY <- gsub("http://([^.]*).270a.info/dataset/.*", "\\1", datasetY, perl=TRUE)
+        domainX <- gsub("http://([^/]*).*", "\\1", datasetX, perl=TRUE)
+        domainY <- gsub("http://([^/]*).*", "\\1", datasetY, perl=TRUE)
+
+        # TODO: Teil später löschen, da Abfrage benötigt -> weiter unten
+        # if (datasetNameX != datasetX && datasetNameY != datasetY) {
+        endpointX <- sparqlEndpoints[datasetNameX]
+        endpointY <- sparqlEndpoints[datasetNameX]
+    }
+    else if (length(d$d) == 3) {
+        t <- strsplit(c(t = d$d[1]), ":") # teilt 1. Dataset bei : um Prefix und Dataset zu erhalten
+        datasetX <- paste0(namespaces[t$t[1]], t$t[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS
+        print(paste0("datasetX = ", datasetX))
+        t <- strsplit(c(t = d$d[2]), ":") # teilt 2. Dataset bei : um Prefix und Dataset zu erhalten
+        datasetY <- paste0(namespaces[t$t[1]], t$t[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.SECO.PC.ZS
+        print(paste0("datasetY = ", datasetY))
+        t <- strsplit(c(t = d$d[3]), ":") # teilt 3. Dataset bei : um Prefix und Dataset zu erhalten
+        datasetZ <- paste0(namespaces[t$t[1]], t$t[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.TERT.PC.ZS
+        print(paste0("datasetZ = ", datasetZ))
+
+        datasetNameX <- gsub("http://([^.]*).270a.info/dataset/.*", "\\1", datasetX, perl=TRUE)
+        datasetNameY <- gsub("http://([^.]*).270a.info/dataset/.*", "\\1", datasetY, perl=TRUE)
+        datasetNameZ <- gsub("http://([^.]*).270a.info/dataset/.*", "\\1", datasetZ, perl=TRUE)
+        domainX <- gsub("http://([^/]*).*", "\\1", datasetX, perl=TRUE)
+        domainY <- gsub("http://([^/]*).*", "\\1", datasetY, perl=TRUE)
+        domainZ <- gsub("http://([^/]*).*", "\\1", datasetZ, perl=TRUE)
+
+        # TODO: Teil später löschen, da Abfrage benötigt -> weiter unten
+        # if (datasetNameX != datasetX && datasetNameY != datasetY ...) {
         endpointX <- sparqlEndpoints[datasetNameX]
         endpointY <- sparqlEndpoints[datasetNameY]
+        endpointZ <- sparqlEndpoints[datasetNameZ]
+    }
+# ABSCHNITT ENDE
+
+
+#XXX: Move this to config
+    #datasetNameX <- gsub("http://([^.]*).270a.info/dataset/.*", "\\1", datasetX, perl=TRUE)    # AUSKOMMENTIERT
+    #datasetNameY <- gsub("http://([^.]*).270a.info/dataset/.*", "\\1", datasetY, perl=TRUE) # datasetY hinzugefügt # AUSKOMMENTIERT
+#print(datasetNameX)
+
+    #domainX <- gsub("http://([^/]*).*", "\\1", datasetX, perl=TRUE) # AUSKOMMENTIERT
+    #domainY <- gsub("http://([^/]*).*", "\\1", datasetY, perl=TRUE) # datasetY hinzugefügt # AUSKOMMENTIERT
+#print(domainX)
+
+
+    # TODO: ev. noch ergänzen, da auch Möglichkeit, dass nur ein oder zwei Datasets exitieren 
+    #if (datasetNameX != datasetX && datasetNameY != datasetY && datasetNameZ != datasetZ) { # ganzer Block hinzugefügt (3 Zeilen & obere 2 Zeilen auskommentiert)
+    #TODO: if gestalten, dass für alle Datasets Kombinationen funktioniert
+   # if (datasetNameX != datasetX && datasetNameY != datasetY) {
+   #     endpointX <- sparqlEndpoints[datasetNameX]
+   #     endpointY <- sparqlEndpoints[datasetNameY]
+   #     #endpointZ <- sparqlEndpoints[datasetNameZ]
 
         print(paste0("RefAreaListe: ", refArea))
         
@@ -164,9 +302,9 @@ sparqlQueryStringGroupedBarPlot <- function(datasetX, datasetY, refArea, refPeri
         s <- strsplit(c(s = refArea), ",") # trennt refArea, wo "," sind & schreibt in Vector -> refArea besteht aus allen refAreas in URL
 
         # TODO: Schleife, die durch refArea geht, je nach dem wie viele refAreas in URL vorhanden sind
-        #for(i in 1:length(refArea)) {
-        #    print(s$s[i])
-        #}  
+        for(i in 1:length(s$s)) {
+            print(paste0("Reference Area: ", s$s[i]))
+        }  
         
         # TODO: Teil wird nicht benötigt -> Ausgabe in SPARQL Query mit s$s[1] usw.
         refArea1 <- s$s[1] # teilt 1. refArea der refArea1 zu
@@ -177,61 +315,105 @@ sparqlQueryStringGroupedBarPlot <- function(datasetX, datasetY, refArea, refPeri
 
 #print(endpointX)
 
-# TODO: eigenes SPARQL Query einbauen
+# Query je nach Anzahl der im URL vorhandenen Datasets gestalten
+# TODO: SERVICE für datasetZ erstellen -> & alle nötigen Anpassungen zur Darstellung in analysis.R vornehmen
+if (length(d$d) == 1) {
     query <- paste0("
-SELECT DISTINCT ?refArea ?x ?y # ?refPeriodX in ?refArea geändert, ?y hinzugefügt
-WHERE {
-    SERVICE <",endpointX,"> {
-        SELECT DISTINCT ?refArea ?x # ?refPeriodX in ?refArea geändert
-        WHERE {
-            ?observationX qb:dataSet <", datasetX, "> .
-
-            ?propertyRefArea rdfs:subPropertyOf* sdmx-dimension:refArea .
-            ?observationX ?propertyRefArea ?refAreaEndpoint . # Zeile hinzugefügt
-
-            ?observationX ?propertyRefPeriod year:", refPeriod, " . # Zeile hinzugefügt
-
-
-            ?propertyMeasureX rdfs:subPropertyOf* sdmx-measure:obsValue .
-            ?observationX ?propertyMeasureX ?x .
-
-            ?refAreaEndpoint skos:notation* ?refArea. # Zeile hinzugefügt 
-
-            # TODO: filter anpassen, je nach Anzahl vorhandener refAreas
-            FILTER (?refArea  = '", s$s[1], "' || ?refArea  = '", s$s[2], "' || ?refArea  = '", s$s[3], "') # Zeile hinzugefügt
-        }
-    }
-
-    SERVICE <",endpointY,"> {
-        SELECT DISTINCT ?refArea ?y # ?refPeriodX in ?refArea geändert
-        WHERE {
-            ?observationY qb:dataSet <", datasetY, "> .
-
-            ?propertyRefArea rdfs:subPropertyOf* sdmx-dimension:refArea .
- 
-            ?observationY ?propertyRefArea ?refAreaEndpoint . # Zeile hinzugefügt
-
-            ?observationY ?propertyRefPeriod year:", refPeriod, " . # Zeile hinzugefügt
-
-            ?propertyMeasureY rdfs:subPropertyOf* sdmx-measure:obsValue .
-            ?observationY ?propertyMeasureY ?y .
-
-            ?refAreaEndpoint skos:notation* ?refArea. # Zeile hinzugefügt 
-
-            # TODO: filter anpassen, je nach Anzahl vorhandener refAreas
-            FILTER (?refArea  = '", s$s[1], "' || ?refArea  = '", s$s[2], "' || ?refArea  = '", s$s[3], "') # Zeile hinzugefügt
-
-        }
-    }
+        SELECT DISTINCT ?refArea ?x 
+    ")
 }
+else if (length(d$d) == 2) {
+    query <- paste0("
+        SELECT DISTINCT ?refArea ?x ?y # ?refPeriodX in ?refArea geändert, ?y hinzugefügt
+    ")
+}
+else if (length(d$d) == 3) {
+    query <- paste0("
+        SELECT DISTINCT ?refArea ?x ?y ?z # ?refPeriodX in ?refArea geändert, ?y hinzugefügt
+    ")
+}
+    query <- paste0(query, "
+        WHERE {
+            SERVICE <",endpointX,"> {
+                SELECT DISTINCT ?refArea ?x # ?refPeriodX in ?refArea geändert
+                WHERE {
+                    ?observationX qb:dataSet <", datasetX, "> .
+
+                    ?propertyRefArea rdfs:subPropertyOf* sdmx-dimension:refArea .
+                    ?observationX ?propertyRefArea ?refAreaEndpoint . # Zeile hinzugefügt
+
+                    ?observationX ?propertyRefPeriod year:", refPeriod, " . # Zeile hinzugefügt
+
+                    ?propertyMeasureX rdfs:subPropertyOf* sdmx-measure:obsValue .
+                    ?observationX ?propertyMeasureX ?x .
+
+                    ?refAreaEndpoint skos:notation* ?refArea . # Zeile hinzugefügt 
+
+                    # wird 1. refArea in URL gefiltert
+                    FILTER (?refArea  = '", s$s[1], "' 
+    ")
+    if (length(s$s) > 1) # existiert mehr als eine refArea in URL -> FILTER wird erweitert
+    {
+        for(i in 2:length(s$s)) { # liest jede refArea in URL aus & fügt zu FILTER hinzu (query wird ergänzt)
+            query <- paste0(query, "
+                || ?refArea  = '", s$s[i], "'
+            ")
+        }
+    }
+    # schliesst Klammer von FILTER
+    query <- paste0(query, ") 
+
+                }
+            }
+    ")
+    if (length(d$d) == 2) {
+    query <- paste0(query, "
+            SERVICE <",endpointY,"> {
+                SELECT DISTINCT ?refArea ?y # ?refPeriodX in ?refArea geändert
+                WHERE {
+                    ?observationY qb:dataSet <", datasetY, "> .
+
+                    ?propertyRefArea rdfs:subPropertyOf* sdmx-dimension:refArea .
+
+                    ?observationY ?propertyRefArea ?refAreaEndpoint . # Zeile hinzugefügt
+
+                    ?observationY ?propertyRefPeriod year:", refPeriod, " . # Zeile hinzugefügt
+
+                    ?propertyMeasureY rdfs:subPropertyOf* sdmx-measure:obsValue .
+                    ?observationY ?propertyMeasureY ?y .
+
+                    ?refAreaEndpoint skos:notation* ?refArea. # Zeile hinzugefügt 
+
+                    # wird 1. refArea in URL gefiltert
+                    FILTER (?refArea  = '", s$s[1], "' 
+    ")
+    if (length(s$s) > 1) # existiert mehr als eine refArea in URL -> FILTER wird erweitert
+    {
+        for(i in 2:length(s$s)) { # liest jede refArea in URL aus & fügt zu FILTER hinzu (query wird ergänzt)
+            query <- paste0(query, "
+                || ?refArea  = '", s$s[i], "'
+            ")
+        }
+    }
+    # schliesst Klammer von FILTER
+    query <- paste0(query, ") 
+
+                }
+            }
+    ")
+    }
+    query <- paste0(query, "
+        }
+    ")
 #ORDER BY ?refPeriodX ?x
-")
+
+
 
         q <- paste(prefixes, query)
 #        print(q)
 
         return(q)
-    }
+ #   } # TODO: Klammer von if (datasetNameX != datasetX && datasetNameY != datasetY) {
 
 
 #    }

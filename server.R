@@ -4,6 +4,7 @@ library(ggplot2)
 library(SPARQL)
 library(digest)
 library(gridSVG)
+library(reshape2)
 
 urlProtocol <- ''
 urlHostname <- ''
@@ -86,16 +87,26 @@ shinyServer(function(input, output, session) {
 
             #Grouped Bar Plot Analysis http://localhost.stats.270a.info/analysis/dev/worldbank:SE.XPD.PRIM.PC.ZS/CA,FR/2009.html
             case6={
-                # Teilung der Datasets aus URL
-                d <- strsplit(c(d = paths[4]), ",") # teilt unterschiedliche Datasets in URL bei ","
-                # print(d$d[1]) # worldbank:SE.XPD.PRIM.PC.ZS
-                # print(d$d[2]) # worldbank:SE.XPD.SECO.PC.ZS
-                s <- strsplit(c(s = d$d[1]), ":") # teilt 1. Dataset bei : um Prefix und Dataset zu erhalten
-                datasetX <- paste0(namespaces[s$s[1]], s$s[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS
-                print(paste0("datasetX = ", datasetX))
-                s <- strsplit(c(s = d$d[2]), ":") # teilt 2. Dataset bei : um Prefix und Dataset zu erhalten
-                datasetY <- paste0(namespaces[s$s[1]], s$s[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.SECO.PC.ZS
-                print(paste0("datasetY = ", datasetY))
+                # TODO: Versuch ob Datasets gleich behandeln kann wie refAreas & erst in SPARQL.R trennen, damit Analysis auch bei Eingabe von 1 Dataset funktioniert -> Schwierigkeit liegt vielleich bei RDF Darstellung -> SPARQL.R Zeile 26 bis 30
+                # datasetX zu dataset
+                dataset <- paths[4] # schreibt alle Datasets aus URL in Variabel -> Trennung der , erfolgt erst in sparql.R
+
+                # GANZER BLOCK AUSKOMMENTIERT -> erfolgt in sparql.R
+
+                ## Teilung der Datasets aus URL
+                #d <- strsplit(c(d = paths[4]), ",") # teilt unterschiedliche Datasets in URL bei ","
+                ## print(d$d[1]) # worldbank:SE.XPD.PRIM.PC.ZS
+                ## print(d$d[2]) # worldbank:SE.XPD.SECO.PC.ZS
+                #s <- strsplit(c(s = d$d[1]), ":") # teilt 1. Dataset bei : um Prefix und Dataset zu erhalten
+                #datasetX <- paste0(namespaces[s$s[1]], s$s[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS
+                #print(paste0("datasetX = ", datasetX))
+                #s <- strsplit(c(s = d$d[2]), ":") # teilt 2. Dataset bei : um Prefix und Dataset zu erhalten
+                #datasetY <- paste0(namespaces[s$s[1]], s$s[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.SECO.PC.ZS
+                #print(paste0("datasetY = ", datasetY))
+
+                # BLOCK AUSKOMMENTIERT ENDE
+
+
 
                 #s <- strsplit(c(s = paths[4]), ":")
                 #print(s$s)
@@ -118,7 +129,7 @@ shinyServer(function(input, output, session) {
                 s <- strsplit(c(s = paths[6]), ":")
                 refPeriod <- paste0(s$s[1]) # speichert refPeriod aus URI
 
-                analysisParams = paste0(datasetX, datasetY, refArea, refPeriod) # refPeriod & datasetY hinzugefügt
+                analysisParams = paste0(dataset, refArea, refPeriod) # refPeriod & datasetY hinzugefügt & datasetX zu dataset
 
                 print(paste0(paste="ALL Reference Areas: ", refArea))
                 print(refPeriod)
@@ -168,7 +179,7 @@ shinyServer(function(input, output, session) {
                     print("Exists in store")
                     meta <- data.frame("n"=analysisSummary$n, "graph"=analysisSummary$graph)
 
-                    analysis <- list("datasetX"=datasetX, "datasetX"=datasetY, "refArea"=refArea, "refPeriod"=refPeriod, "data"=data, "meta"=meta, "id"=id) # refPeriod & datasetY hinzugefügt
+                    analysis <- list("dataset"=dataset, "refArea"=refArea, "refPeriod"=refPeriod, "data"=data, "meta"=meta, "id"=id) # refPeriod & datasetY hinzugefügt & datasetX zu dataset
                 },
                 {}
             )
@@ -197,16 +208,16 @@ shinyServer(function(input, output, session) {
                     print("Query analysis")
                     print(refPeriod)
 
-                    if(!is.na(datasetX) && !is.na(datasetY)) { # TODO: wird Schliefe benötigt?
-                        print("datasetX & datasetY VORHANDEN")
-                        data <- sQGroupedBarPlot(datasetX, datasetY, refArea, refPeriod) # refPeriod & datasetY hinzugefügt
+                    #if(!is.na(datasetX) && !is.na(datasetY)) { # TODO: wird Schliefe benötigt?
+                        #print("datasetX & datasetY VORHANDEN")
+                        data <- sQGroupedBarPlot(dataset, refArea, refPeriod) # refPeriod & datasetY hinzugefügt & datasetX zu dataset
                         #data <- sQGroupedBarPlot(datasetX, paste0(namespaces$wbcountry, refArea), refPeriod) # refPeriod hinzugefügt 
                         #data <- sQGroupedBarPlot(datasetX, paste0("http://worldbank.270a.info/classification/country/CH"))                    
                         #data <- sQGroupedBarPlot(datasetX, refArea)
-                    }
-                    else if(!is.na(datasetX) && is.na(datasetY)) {
-                        print("datasetY NICHT VORHANDEN")
-                    }
+                    #}
+                    #else if(!is.na(datasetX) && is.na(datasetY)) {
+                    #    print("datasetY NICHT VORHANDEN")
+                    #}
                     
                 },
                 {}
@@ -237,9 +248,9 @@ shinyServer(function(input, output, session) {
                   #Grouped Bar Plot
                     case6={
                         #Build analysis
-                        analysis <- getAnalysisGroupedBarPlot(datasetX, datasetY, refArea, refPeriod, data) # refPeriod & datasetY hinzugefügt
+                        analysis <- getAnalysisGroupedBarPlot(dataset, refArea, refPeriod, data) # refPeriod & datasetY hinzugefügt & datasetX zu dataset
                         #Update store
-                        storeUpdated <- sUGroupedBarPlot(analysisURI, datasetX, datasetY, refArea, refPeriod, data, analysis) # refPeriod & datasetY hinzugefügt
+                        storeUpdated <- sUGroupedBarPlot(analysisURI, dataset, refArea, refPeriod, data, analysis) # refPeriod & datasetY hinzugefügt & datasetX zu dataset
                     },
                     {}
                 )
