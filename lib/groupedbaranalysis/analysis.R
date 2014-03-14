@@ -12,8 +12,24 @@ getAnalysisGroupedBarPlot <- function(dataset, refArea, refPeriod, data) { # ref
 outputPlotGroupedBarPlot <- function(analysis) {
     if (is.null(analysis[["warning"]])) {
         csvPath <- paste0("/csv/", analysis$id, ".csv")
+
+    # Genereates Vector of Datasets -> [2]http://worldbank.../../SE.XPD.PRIM.PC.ZS [3]http://worldbank.../../SE.XPD.SECO.PC.ZS 
+    d <- strsplit(c(d = analysis$dataset), ",") # teilt unterschiedliche Datasets in URL bei ","
+
+    ds = ''
+    datasetLabel = ''    
+    # Looping over datasets
+    for (i in 1:length(d$d)) { # length(d$d) = Amount of Datasets
+         t <- strsplit(c(t=d$d[i]), ":") # teilt Dataset bei : um Prefix und Dataset zu erhalten
+         dataset <- paste0(namespaces[t$t[1]], t$t[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS
+         datasetLabel <- append(datasetLabel, resourceLabels[dataset]) # fügt alle datasetLabel in einem Vector zusammen -> datasetLabel[2] = "Expenditure per student, primary (% of GDP per capita)"
+         ds <- append(ds, dataset) # fügt alle Datasetnamen in einem Vector zusammen  
+    }
+    dataset <- ds # dataset ist Vector bestehend aus allen Datasets [2]http://worldbank.../../SE.XPD.PRIM.PC.ZS [3]http://worldbank.../../SE.XPD.SECO.PC.ZS 
+
+
         
-# GANZER BLOCK HINZUGEFÜGT FÜR VARIABLE ANZAHL DATASETS
+# TODO: GANZER BLOCK LÖSCHEN
     d <- strsplit(c(d = analysis$dataset), ",") # teilt unterschiedliche Datasets in URL bei ","
     # print(d$d[1]) # worldbank:SE.XPD.PRIM.PC.ZS
     # print(d$d[2]) # worldbank:SE.XPD.SECO.PC.ZS
@@ -48,7 +64,7 @@ outputPlotGroupedBarPlot <- function(analysis) {
         datasetYLabel <- resourceLabels[datasetY] # Zeile hinzugefügt
         datasetZLabel <- resourceLabels[datasetZ] # Zeile hinzugefügt
     }
-# ABSCHNITT ENDE
+# TODO: BLOCK LÖSCHENT ENDE
 
 
 
@@ -59,7 +75,7 @@ outputPlotGroupedBarPlot <- function(analysis) {
         print(analysis$refArea)
         print(analysis$refPeriod)
         print(analysis$data)
-        print(analysis$data$x)
+        #print(analysis$data$x)
 
         if (is.null(analysis$meta$graph)) {
             plotPath <- paste0("plots/", analysis$id, ".svg") # erstellt Pfadname des Plots
@@ -79,7 +95,7 @@ outputPlotGroupedBarPlot <- function(analysis) {
                 #datasetYLabel <- resourceLabels[datasetY] # Zeile hinzugefügt
                 refArea <- resourceLabels[analysis$refArea] # resourceLabels in /var/shiny-server/www/lsd-analysis/lib/resourceLabels.R -> dort Länder ergänzen
 
-                print(paste0("DATASET X Label: ", datasetXLabel))
+                print(paste0("DATASET X Label: ", datasetLabel[2]))
                 #print(paste0("ANALYSIS DATASET X: ", analysis$datasetX))
                 print("test3")
                 print(data)
@@ -90,7 +106,7 @@ outputPlotGroupedBarPlot <- function(analysis) {
                 print(paste0("DATASETX data: ", data$dataset))
                 print(data$x)
 
-          
+# TODO: ABSCHNITT LÖSCHEN
                 #dfX = data.frame(refArea=data$refArea, obsValue=data$x, dataset=analysis$datasetX)
                 #dfX = data.frame(refArea=data$refArea, obsValue=data$x, dataset=analysis$datasetX, stringsAsFactors=FALSE)
                 #dfX = data.table("refArea"=data$refArea, obsValue=data$x, dataset=analysis$datasetX)
@@ -106,24 +122,58 @@ outputPlotGroupedBarPlot <- function(analysis) {
                 #print(paste0("PlotdataOBSVALUE: ", plotdata$obsValue))
                 #print(paste0("PlotdataDATASET: ", plotdata$dataset))
                 #write.table(plotdata)
+# TODO: ABSCHNITT LÖSCHEN ENDE
 
-                # Melts obsValues from CSV file into one column, which is necessary to output a grouped bar plot
-                if (length(d$d) == 1) {
+# TODO: wird ev. nicht benötigt
+                # Generates obsValue[2] = obsValueABCDEF & measureVariables[2] = abcdef 
+                obsValue = ''
+                measureVariables = ''
+                for (i in 2:length(data[1, ])) { 
+                    oV <- paste0("obsValue", toupper(colnames(data)[i]))
+                    obsValue <- append(obsValue, oV)
+                    mV <- colnames(data)[i]
+                    measureVariables <- append(measureVariables, mV)
+
+                } 
+# TODO: ENDE ev. nicht benötigt
+
+# TODO: ist im Moment noch hartcodiert -> data[, 2], data[, 3] muss heraufgezählt werden, wie an anderen Orten
+# datasetLabel[2], datasetLabel[3] & datasetLabel[2], " and ", datasetLabel[3] MUSS ALLES Variabel sein
+                if (length(d$d) == 2) { # TODO: Länge nicht hartcodieren
+                    # Melts obsValues from CSV file into one column in a DataFrame, which is necessary to output a grouped bar plot
+                    df = data.frame(refArea=data$refArea, data[, 2], data[, 3])
+                    colnames(df) <- c("refArea", datasetLabel[2], datasetLabel[3]) # benennt Spaltenname, welche für Plot benötigt werden
+                    plotdata <- melt(df, id=c(df$refArea), id.vars=1)
+
+
+                    g <- ggplot(plotdata, environment = environment(), aes(x=refArea, y=value, fill=variable)) + geom_bar(stat="identity", position="dodge") + labs(list(x="Reference Area", y="Value", fill="Datasets", title=paste0(datasetLabel[2], " and ", datasetLabel[3]))) + theme(legend.position="bottom") + geom_text(aes(label=value), position=position_dodge(width=0.9), vjust=-0.25)
+                }
+
+
+
+
+# TODO: Abschnitt löschen
+                # Melts obsValues from CSV file into one column in a DataFrame, which is necessary to output a grouped bar plot
+                else if (length(d$d) == 1) {
                     df = data.frame(refArea=data$refArea, obsValueX=data$x) # schreibt Daten aus CSV-File in data.frame, damit obsValue Werte in eine Spalte zusammengefügt werden können, anstelle von zwei Spalten
                     colnames(df) <- c("refArea", datasetXLabel) # benennt Spaltenname, welche für Plot benötigt werden
                     plotdata <- melt(df, id=c(df$refArea), id.vars=1) # fügt X und Y Werte aus zwei Spalten in eine Spalte zusammen
                     g <- ggplot(plotdata, environment = environment(), aes(x=refArea, y=value, fill=variable)) + geom_bar(stat="identity", position="dodge") + labs(list(x="Reference Area", y="Value", fill="Datasets", title=paste0(datasetXLabel))) + theme(legend.position="bottom") + geom_text(aes(label=value), position=position_dodge(width=0.9), vjust=-0.25)
+ # TODO: Abschnitt löschen ENDE               
                 }
-                else if (length(d$d) == 2) {
-                    df = data.frame(refArea=data$refArea, obsValueX=data$x, obsValueY=data$y) # schreibt Daten aus CSV-File in data.frame, damit obsValue Werte in eine Spalte zusammengefügt werden können, anstelle von zwei Spalten
-                    colnames(df) <- c("refArea", datasetXLabel, datasetYLabel) # benennt Spaltenname, welche für Plot benötigt werden
-                    plotdata <- melt(df, id=c(df$refArea), id.vars=1) # fügt X und Y Werte aus zwei Spalten in eine Spalte zusammen
-                    print(paste0("DF: ", df))
-                    print(plotdata)
 
-                    g <- ggplot(plotdata, environment = environment(), aes(x=refArea, y=value, fill=variable)) + geom_bar(stat="identity", position="dodge") + labs(list(x="Reference Area", y="Value", fill="Datasets", title=paste0(datasetXLabel, " and ", datasetYLabel))) + theme(legend.position="bottom") + geom_text(aes(label=value), position=position_dodge(width=0.9), vjust=-0.25)
+# TODO: Abschnitt löschen
+
+ #               else if (length(d$d) == 2) {
+ #                   df = data.frame(refArea=data$refArea, obsValueX=data$x, obsValueY=data$y) # schreibt Daten aus CSV-File in data.frame, damit #obsValue Werte in eine Spalte zusammengefügt werden können, anstelle von zwei Spalten
+ #                   colnames(df) <- c("refArea", datasetXLabel, datasetYLabel) # benennt Spaltenname, welche für Plot benötigt werden
+ #                   plotdata <- melt(df, id=c(df$refArea), id.vars=1) # fügt X und Y Werte aus zwei Spalten in eine Spalte zusammen
+ #                   print(paste0("DF: ", df))
+ #                   print(plotdata)
+
+  #                  g <- ggplot(plotdata, environment = environment(), aes(x=refArea, y=value, fill=variable)) + geom_bar(stat="identity", position="dodge") + labs(list(x="Reference Area", y="Value", fill="Datasets", title=paste0(datasetXLabel, " and ", datasetYLabel))) + theme(legend.position="bottom") + geom_text(aes(label=value), position=position_dodge(width=0.9), vjust=-0.25)
                 
-                }
+#                }
 
                 #g <- ggplot(plotdata, aes(x=plotdata$refArea, y=plotdata$obsValue, fill=plotdata$dataset)) + geom_bar(stat="identity", position="dodge") + labs(list(x="Reference Area", y="Value", fill="Datasets", title="Test"))
 
@@ -131,6 +181,7 @@ outputPlotGroupedBarPlot <- function(analysis) {
 
                # g <- ggplot(data, environment = environment(), aes(x=data$refPeriod, y=data$x)) + geom_line(aes=(size=2)) + labs(list(x="Reference Period", y="Value", title=paste0(datasetXLabel, " for ", refArea)))
 
+# TODO: Abschnitt löschen ENDE
                 g <- g + annotate("text", x=Inf, y=Inf, label="270a.info", hjust=1.3, vjust=2, color="#0000E4", size=4)
 
                 ggsave(plot=g, file=paste0("www/", plotPath), width=7, height=7)
@@ -156,7 +207,10 @@ outputPlotGroupedBarPlot <- function(analysis) {
 
 outputAnalysisSummaryGroupedBarPlot <- function(analysis) {
     if (is.null(analysis[["warning"]])) {
-        
+
+
+# TODO: Summary erstellen 
+       
         data <- analysis$data 
 
 # GANZER BLOCK HINZUGEFÜGT FÜR VARIABLE ANZAHL DATASETS
