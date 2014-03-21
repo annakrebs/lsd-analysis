@@ -31,6 +31,10 @@ sparqlUpdateGroupedBarPlot <- function(analysisURI, dataset, refArea, refPeriod,
     }
     dataset <- ds # dataset ist Vector bestehend aus allen Datasets [2]http://worldbank.../../SE.XPD.PRIM.PC.ZS [3]http://worldbank.../../SE.XPD.SECO.PC.ZS 
 
+    
+    # Splits refAreas at "," & writes them in Vector
+    s <- strsplit(c(s = refArea), ",") # trennt refArea, wo "," sind & schreibt in Vector -> refArea besteht aus allen refAreas in URL
+
 
 #FIXME: xsd:decimal assignment is problematic because not all values are xsd:decimal!
 
@@ -42,7 +46,8 @@ sparqlUpdateGroupedBarPlot <- function(analysisURI, dataset, refArea, refPeriod,
         statsData <- paste0(statsData, "
             stats:data [
                 a stats:DataRow ;
-                stats:refArea \"", data[i, 'refArea'], "\" ;
+                stats:refArea <", paste0(namespaces$wbcountry, data[i, 'refArea']), "> ;
+ 
         ")
         # Loop through measureVariables to get measure Values -> stats:measureABCDEF "23.20144"^^xsd:decimal ;
         for (j in 2:length(data[1, ])) { # gibt measureVariable in Grossbuchstaben aus & hängt passender obsValue an
@@ -55,14 +60,34 @@ sparqlUpdateGroupedBarPlot <- function(analysisURI, dataset, refArea, refPeriod,
         )
     }
 
-
-    # TODO: Ausgabe der Summary-Werte (stats:min, stats:q1, stats:mean, stats:q2, stats:max, stats:median)
+# TODO: gibt kein modelsData in analysis.R -> daher ev. löschen
     statsSummary <- paste0("<", analysisURI, ">")
     for (i in 1:length(analysis$modelsData[, 1])) {
         statsSummary <- paste0(statsSummary, "
             stats:summary [
                 a stats:Summary ;
                 stats:n \"", analysis$modelsData[i, 'n'], "\"^^xsd:double
+            ] ;"
+        )
+    }
+# TODO: Ende ev. löschen
+
+    statsSummary <- paste0("<", analysisURI, ">") # Abschnitt hinzugefügt
+    for (i in 2:length(analysis$meta[, 1])) {
+        statsSummary <- paste0(statsSummary, "
+            stats:summary [
+                a stats:Summary ;
+                stats:dataset",toupper(colnames(data)[i])," <", dataset[i], "> ;
+                stats:min \"", analysis$meta$minValues[i], "\"^^xsd:decimal ; 
+                stats:q1 \"", analysis$meta$q1Values[i], "\"^^xsd:decimal ;
+                stats:mean \"", analysis$meta$meanValues[i], "\"^^xsd:decimal ;
+                stats:q3 \"", analysis$meta$q3Values[i], "\"^^xsd:decimal ;
+                stats:max \"", analysis$meta$maxValues[i], "\"^^xsd:decimal ;
+                stats:median \"", analysis$meta$medianValues[i], "\"^^xsd:decimal ;
+            ")       
+
+        statsSummary <- paste0(statsSummary, "            
+                stats:n \"", analysis$meta[i, 'n'], "\"^^xsd:double
             ] ;"
         )
     }
@@ -102,16 +127,29 @@ INSERT DATA {
             prov:used <https://github.com/csarven/lsd-analysis> ;
         ")
 
-        # Loop through measureVariables to retrieve Dataset names -> prov:used <http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS> ;
+        # Loop through measureVariables to retrieve all Dataset names -> prov:used <http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS> ;
         for (i in 2:length(data[1, ])) { # 2:length(data[1, ]) = Amount of measureVariables
             query <- paste0(query, "
                 prov:used <", dataset[i], "> ;
             ")
         }
+        # Loop through obsValues to retrieve all refAreas names and adds namespace from Worldbank in order to get URI
+        for(i in 1:length(data[, 1])) { # 1:length(data[, 1]) = Amount of obsValues
+            if (i == 1) { # adds text "Reference Area" in the row of the first refArea and displays URI and name of all the other refAreas
+                query <- paste0(query, "
+                    prov:used <", paste0(namespaces$wbcountry, data[i, 'refArea']), "> ;
+                ") 
+            }
+            else { # displays URI and name of all the other refAreas
+                if (data[i-1, 'refArea'] != data[i, 'refArea']) { # only displays the same refArea once
+                    query <- paste0(query, "
+                        prov:used <", paste0(namespaces$wbcountry, data[i, 'refArea']), "> ;
+                    ") 
+                }
+            } 
+        }
 
         query <- paste0(query, "  
-            #prov:used <", refArea, "> ; # TODO: refArea entfernen
-
             prov:generated <", analysisURI, "> ;
             dcterms:license <", licenseURI, ">
         .
@@ -137,9 +175,23 @@ INSERT DATA {
                 stats:dataset",toupper(colnames(data)[i])," <", dataset[i], "> ;
             ")
         }
+        # Loop through obsValues to retrieve all refAreas names and adds namespace from Worldbank in order to get URI
+        for(i in 1:length(data[, 1])) { # 1:length(data[, 1]) = Amount of obsValues
+            if (i == 1) { # adds text "Reference Area" in the row of the first refArea and displays URI and name of all the other refAreas
+                query <- paste0(query, "
+                    stats:refArea <", paste0(namespaces$wbcountry, data[i, 'refArea']), "> ;
+                ") 
+            }
+            else { # displays URI and name of all the other refAreas
+                if (data[i-1, 'refArea'] != data[i, 'refArea']) { # only displays the same refArea once
+                    query <- paste0(query, "
+                        stats:refArea <", paste0(namespaces$wbcountry, data[i, 'refArea']), "> ;
+                    ") 
+                }
+            } 
+        }
 
         query <- paste0(query, "  
-            #stats:refArea <", refArea, "> ; # TODO: refArea entfernen
 
             stats:n \"", nrow(data), "\"^^xsd:integer
         .
@@ -171,9 +223,16 @@ WHERE {
     GRAPH <http://stats.270a.info/graph/analysis> {
         <", analysisURI, ">
             stats:dataset ?dataset ; # datasetX zu dataset
-            #stats:refArea ?refArea ; # TODO: refArea entfernen
+            stats:refArea ?refArea ; # TODO: refArea entfernen
+            stats:refPeriod ?refPeriod ;
             stats:graph ?graph ;
             stats:n ?n ;
+            stats:minValues ?minValues ;
+            stats:q1Values ?q1Values ;
+            stats:meanValues ?meanValues ;
+            stats:q3Values ?q3Values ;
+            stats:maxValues ?maxValues ;
+            stats:medianValues ?medianValues 
     }
 }
 ");
@@ -232,19 +291,6 @@ sparqlQueryStringGroupedBarPlot <- function(dataset, refArea, refPeriod) { # ref
     # lengt(s$s) = Amount of refAreas
 
 
-# TODO: ABSCHNIT LÖSCHEN
-        for(i in 1:length(s$s)) {
-            print(paste0("Reference Area: ", s$s[i]))
-        }          
-        # TODO: Teil wird nicht benötigt -> Ausgabe in SPARQL Query mit s$s[1] usw.
-        print(paste0("RefAreaListe: ", refArea))
-        refArea1 <- s$s[1] # teilt 1. refArea der refArea1 zu
-        refArea2 <- s$s[2] # teilt 2. refArea der refArea2 zu
-        print(paste0("REFAREA1: ", refArea1))
-        print(paste0("REFAREA2: ", refArea2))
-# TODO: ABSCHNIT LÖSCHEN ende
-
-
     # Generates measureVariables according to the amount of Datasets that will be used in SELECT part of query
     measureVariables = ''
     # Loop endpoints
@@ -292,15 +338,15 @@ sparqlQueryStringGroupedBarPlot <- function(dataset, refArea, refPeriod) { # ref
             SERVICE <",endpoints[i],"> {                
                 SELECT DISTINCT ?refArea ", mV[[1]][i], "  
                 WHERE {
-                    ?observationX qb:dataSet <", dataset[i], "> .
+                    ?observation qb:dataSet <", dataset[i], "> .
 
                     ?propertyRefArea rdfs:subPropertyOf* sdmx-dimension:refArea .
-                    ?observationX ?propertyRefArea ?refAreaEndpoint . # Zeile hinzugefügt
+                    ?observation ?propertyRefArea ?refAreaEndpoint . # Zeile hinzugefügt
 
-                    ?observationX ?propertyRefPeriod year:", refPeriod, " . # Zeile hinzugefügt
+                    ?observation ?propertyRefPeriod year:", refPeriod, " . # Zeile hinzugefügt
 
-                    ?propertyMeasureX rdfs:subPropertyOf* sdmx-measure:obsValue .
-                    ?observationX ?propertyMeasureX ", mV[[1]][i], " .
+                    ?propertyMeasure rdfs:subPropertyOf* sdmx-measure:obsValue .
+                    ?observation ?propertyMeasure ", mV[[1]][i], " .
 
                     ?refAreaEndpoint skos:notation* ?refArea . # Zeile hinzugefügt 
 

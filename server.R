@@ -87,47 +87,24 @@ shinyServer(function(input, output, session) {
 
             #Grouped Bar Plot Analysis http://localhost.stats.270a.info/analysis/dev/worldbank:SE.XPD.PRIM.PC.ZS/CA,FR/2009.html
             case6={
-                # TODO: Versuch ob Datasets gleich behandeln kann wie refAreas & erst in SPARQL.R trennen, damit Analysis auch bei Eingabe von 1 Dataset funktioniert -> Schwierigkeit liegt vielleich bei RDF Darstellung -> SPARQL.R Zeile 26 bis 30
-                # datasetX zu dataset
-                dataset <- paths[4] # schreibt alle Datasets aus URL in Variabel -> Trennung der , erfolgt erst in sparql.R
 
-                # GANZER BLOCK AUSKOMMENTIERT -> erfolgt in sparql.R
-
-                ## Teilung der Datasets aus URL
-                #d <- strsplit(c(d = paths[4]), ",") # teilt unterschiedliche Datasets in URL bei ","
-                ## print(d$d[1]) # worldbank:SE.XPD.PRIM.PC.ZS
-                ## print(d$d[2]) # worldbank:SE.XPD.SECO.PC.ZS
-                #s <- strsplit(c(s = d$d[1]), ":") # teilt 1. Dataset bei : um Prefix und Dataset zu erhalten
-                #datasetX <- paste0(namespaces[s$s[1]], s$s[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS
-                #print(paste0("datasetX = ", datasetX))
-                #s <- strsplit(c(s = d$d[2]), ":") # teilt 2. Dataset bei : um Prefix und Dataset zu erhalten
-                #datasetY <- paste0(namespaces[s$s[1]], s$s[2]) # setzt Namespace vor Dataset -> http://worldbank.270a.info/dataset/SE.XPD.SECO.PC.ZS
-                #print(paste0("datasetY = ", datasetY))
-
-                # BLOCK AUSKOMMENTIERT ENDE
-
-
-
-                #s <- strsplit(c(s = paths[4]), ":")
-                #print(s$s)
-                #print(s$s[1])
-                #datasetX <- paste0(namespaces[s$s[1]], s$s[2])
-
-                
-                #s <- strsplit(c(s = paths[5]), ",") # ist überflüssig, da Trennung der refArea erst in sparql.R geschieht
-                #print(s$s[1])
-                #print(s$s[2])
-                
-                #refArea <- paste0(s$s[1]) # s$s[1] ist 1. Land
-                #refArea2 <- paste0(s$s[2]) # s$s[2] ist 2. Land -> ist überflüssig -> in sparql.R gelöst
-                #refArea <- paste0(s$s[1], s$s[2]) # speichert refArea aus URI -> im Moment nur 1 refArea möglich (z.B. CH)
+                # datasets (datasets are split in sparql.R)
+                if (length(paths[4]) > 0) # checks if datasets exist in URI
+                {
+                    dataset <- paths[4] 
+                }
                 
                 # refAreas (refAreas are split in sparql.R)
-                refArea <- paths[5] # schreibt alle refAreas aus URL in Variabel -> Trennung der , erfolgt erst in sparql.R
-
-                # Teilung der refPeriod aus URL
-                s <- strsplit(c(s = paths[6]), ":")
-                refPeriod <- paste0(s$s[1]) # speichert refPeriod aus URI
+                if (length(paths[5]) > 0) # checks if refAreas exist in URI
+                {
+                    refArea <- paths[5] 
+                }
+                
+                # refPeriod
+                if (length(paths[6]) > 0) # checks if refPeriod exists in URI
+                {
+                    refPeriod <- paths[6]
+                }
 
                 analysisParams = paste0(dataset, refArea, refPeriod) # refPeriod & datasetY hinzugefügt & datasetX zu dataset
 
@@ -177,7 +154,8 @@ shinyServer(function(input, output, session) {
                 #Grouped Bar Plot
                 case6={
                     print("Exists in store")
-                    meta <- data.frame("n"=analysisSummary$n, "graph"=analysisSummary$graph)
+                    meta <- data.frame("n"= nrow(data), "minValues"=analysisSummary$minValues, "q1Values"=analysisSummary$q1Values, "meanValues"=analysisSummary$meanValues, "q3Values"=analysisSummary$q3Values, "maxValues"=analysisSummary$maxValues, "medianValues"=analysisSummary$medianValues, "graph"=analysisSummary$graph) 
+                    #meta <- data.frame("n"=analysisSummary$n, "graph"=analysisSummary$graph)
 
                     analysis <- list("dataset"=dataset, "refArea"=refArea, "refPeriod"=refPeriod, "data"=data, "meta"=meta, "id"=id) # refPeriod & datasetY hinzugefügt & datasetX zu dataset
                 },
@@ -203,22 +181,11 @@ shinyServer(function(input, output, session) {
                 },
                 #Grouped Bar Plot
                 case6={
-                    # sendet Daten ansparqlQueryStringGroupedBarPlot(....) in sparql.R
-    
                     print("Query analysis")
                     print(refPeriod)
 
-                    #if(!is.na(datasetX) && !is.na(datasetY)) { # TODO: wird Schliefe benötigt?
-                        #print("datasetX & datasetY VORHANDEN")
-                        data <- sQGroupedBarPlot(dataset, refArea, refPeriod) # refPeriod & datasetY hinzugefügt & datasetX zu dataset
-                        #data <- sQGroupedBarPlot(datasetX, paste0(namespaces$wbcountry, refArea), refPeriod) # refPeriod hinzugefügt 
-                        #data <- sQGroupedBarPlot(datasetX, paste0("http://worldbank.270a.info/classification/country/CH"))                    
-                        #data <- sQGroupedBarPlot(datasetX, refArea)
-                    #}
-                    #else if(!is.na(datasetX) && is.na(datasetY)) {
-                    #    print("datasetY NICHT VORHANDEN")
-                    #}
-                    
+                    # übergibt Daten an sparqlQueryStringGroupedBarPlot(....) in sparql.R
+                    data <- sQGroupedBarPlot(dataset, refArea, refPeriod) # refPeriod & datasetY hinzugefügt & datasetX zu dataset      
                 },
                 {}
 
