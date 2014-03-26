@@ -15,6 +15,7 @@
         <script src="/shiny/jquery.js" type="text/javascript"></script>
         <script src="/shiny/shiny.js" type="text/javascript"></script>
         <script src="/shiny/index.js" type="text/javascript"></script>
+
     </head>
 
     <body id="site_home">
@@ -54,6 +55,142 @@
                     <div id="content_inner">
                         <div class="entry-content">
 
+<!--<form action="http://localhost.stats.270a.info/analysis/dev/" method="post">-->
+<form action="" id="form_analysis" class="well">
+
+    <!-- Selection of the Datasets -->
+
+    <label class="datasets-label" for="dataset">Datasets</label>
+    <select id="datasets" multiple size="10" name="datasets" style="width: 200px">
+        <optgroup label="World Bank">
+        <option value="http://worldbank.270a.info/dataset/allsi.lekbf_q1" onmouseover="window.status=this.value" title="% benefits held by non poor -All Social Insurance" >% benefits held by non poor -All Social Insurance</option>
+        <option value="http://worldbank.270a.info/dataset/allsp.lekbf_q1" onmouseover="window.status=this.value" title="% benefits held by non poor -All Social Protection" >% benefits held by non poor -All Social Protection</option>
+        <option value="http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS" onmouseover="window.status=this.value" title="Expenditure per student, primary (% of GDP per capita)" >Expenditure per student, primary (% of GDP per capita)</option>
+        <option value="http://worldbank.270a.info/dataset/SE.XPD.SECO.PC.ZS" onmouseover="window.status=this.value" title="Expenditure per student, secondary (% of GDP per capita)" >Expenditure per student, secondary (% of GDP per capita)</option>
+        <option value="http://worldbank.270a.info/dataset/SE.XPD.TERT.PC.ZS" onmouseover="window.status=this.value" title="Expenditure per student, tertiary (% of GDP per capita)" >Expenditure per student, tertiary (% of GDP per capita)</option>
+
+        <optgroup label="Transparency International">
+        <option value="http://transparency.270a.info/dataset/CPI2009" onmouseover="window.status=this.value" title="Corruption Perceptions Index 2009" >Corruption Perceptions Index 2009</option>
+        <option value="http://transparency.270a.info/dataset/CPI2010" onmouseover="window.status=this.value" title="Corruption Perceptions Index 2010" >Corruption Perceptions Index 2010</option>
+        <option value="http://transparency.270a.info/dataset/CPI2011" onmouseover="window.status=this.value" title="Corruption Perceptions Index 2011" >Corruption Perceptions Index 2011</option>
+        </optgroup>
+    </select>
+
+    <button id="select-dataset" type="button" onclick="addDataset()" value="Submit"> > </button></br>
+    <button id="deselect-dataset" type="button" onclick="removeDataset()" value="Submit"> < </button>
+
+    <label class="datasets-label" for="dataset">Selected Datasets</label>
+    <select name="selectedDatasets" id="selectedDatasets" multiple size="10" style="width: 200px">
+    </select>
+
+
+    <!-- Selection of the Reference Areas -->
+
+    <label class="refAreas-label" for="refAreas">Reference Areas</label>
+    <select id="refAreas" multiple size="10" name="refAreas" style="width: 200px">
+        <option value="http://worldbank.270a.info/classification/country/AU">Australia</option>
+        <option value="http://worldbank.270a.info/classification/country/FR">France</option>
+        <option value="http://worldbank.270a.info/classification/country/IT">Italy</option>
+        <option value="http://worldbank.270a.info/classification/country/CH">Switzerland</option>
+        <option value="http://worldbank.270a.info/classification/country/US">United States</option>
+    </select>
+
+    <button id="select-refArea" type="button" class="btn btn-primary" onclick="addRefArea()"> > </button> </br>
+    <button id="deselect-refArea" type="button" class="btn btn-primary" onclick="removeRefArea()"> < </button>
+
+    <label class="selected-refAreas-label" for="selected-refAreas">Selected Reference Areas</label>
+    <select id="selectedRefAreas" multiple size="10" name="selectedRefAreas" style="width: 200px">
+    </select>
+
+
+    <!-- Selection of the Reference Period -->
+
+    <label class="refPeriod-label" for="refPeriod">Reference Period</label>
+    <span id="rP">2007</span> <!-- displays value of selected refArea -> function showRefPeriod(...) -->
+    <input type="range" id="sliderBar" autocomplete="off" min="2000" max="2013" step="1" value="2007" onChange="showRefPeriod(this.value);"/> 
+
+    <button id="reset" type="reset">Clear selection</button>
+
+    <button id="analyze" type="submit" class="btn btn-primary" onclick="getSelectedValues()"> Analyze </button>
+
+    <div id="plot" class="shiny-html-output" style="width:60%;"></div>
+
+    <div id="statsSummary" class="shiny-html-output"></div>
+
+</div>
+</div>
+</div>
+</div>
+
+            <div id="footer">
+                <p>Got feedback? Please see <a href="https://github.com/csarven/lsd-analysis">source code</a> and create an issue, or <a href="http://csarven.ca/#i">contact me</a>.</p>
+            </div>
+</div>
+
+    </body>
+</html>
+
+
+<!--
+
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Linked Statistical Data Analysis</title>
+
+        <link rel="shortcut icon" href="/favicon.ico?v=0.0.2"/>
+
+        <meta name="description" content="Linked Statistical Data Analysis: A path to using federated queries, statistical analysis and reuse of statistical data."/>
+        <meta name="author" content="http://csarven.ca/#i"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+        <link rel="stylesheet" type="text/css" href="/theme/default/css/display.css?version=0.0.2" media="all"/>
+
+        <script src="/shiny/jquery.js" type="text/javascript"></script>
+        <script src="/shiny/shiny.js" type="text/javascript"></script>
+        <script src="/shiny/index.js" type="text/javascript"></script>
+    </head>
+
+    <body id="site_home">
+        <div id="wrap">
+            <div id="header">
+                <address id="site_contact" class="vcard">
+                    <a href="http://stats.270a.info/" class="url home bookmark">
+                        <img class="logo photo" src="/theme/default/images/logos/logo_stats-linked-data.png" width="48" height="48"/>
+                        <span class="fn org">Linked Statistical Data Analysis</span>
+                    </a>
+                </address>
+
+                <dl id="site_nav_global_primary">
+                    <dt>Primary site navigation</dt>
+                    <dd>
+                        <ul class="nav">
+                            <li id="nav_home">
+                                <a rel="section" href="http://stats.270a.info/" title="Home page">Home</a>
+                            </li>
+                            <li id="nav_help">
+                                <a rel="section" href="http://csarven.ca/linked-statistical-data-analysis" title="About Linked Statistical Data Analysis">About LSD Analysis</a>
+                            <li id="nav_sparql">
+                                <a rel="section" href="http://stats.270a.info/sparql">SPARQL</a>
+                            </li>
+                            <li id="nav_270a.info">
+                                <a rel="section" href="http://270a.info/">270a</a>
+                            </li>
+                        </ul>
+                    </dd>
+                </dl>
+            </div>
+
+            <div id="core">
+                <div id="content">
+                    <h1>Linked Statistical Data Analysis</h1>
+
+                    <div id="content_inner">
+                        <div class="entry-content">
+
+-->
+
 <!--<div class="container-fluid">-->
 <!--  <div class="row-fluid">-->
 <!--    <div class="span12" style="padding: 10px 0px;">-->
@@ -62,6 +199,8 @@
 <!--  </div>-->
 <!--  <div class="row-fluid">-->
 <!--    <div class="span4">-->
+
+<!--
       <form id="form_analysis" class="well">
         <label class="control-label" for="datasetX">Independent variable</label>
         <select id="datasetX">
@@ -16693,3 +16832,5 @@
 
 </body>
 </html>
+
+-->

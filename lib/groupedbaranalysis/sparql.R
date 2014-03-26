@@ -39,8 +39,6 @@ sparqlUpdateGroupedBarPlot <- function(analysisURI, dataset, refArea, refPeriod,
 #FIXME: xsd:decimal assignment is problematic because not all values are xsd:decimal!
 
     # data[i, 2] -> ist obsValue Wert (z.B. "18") in 1. Spalte der measureVariable "abcdef"
-    # toupper(colnames(data)[2])," -> ist Spaltenname (in Grossbuchstaben) der 1. measureVariable Spalte
-
     statsData <- paste0("<", analysisURI, ">")
     for (i in 1:length(data[, 1])) {
         statsData <- paste0(statsData, "
@@ -52,7 +50,7 @@ sparqlUpdateGroupedBarPlot <- function(analysisURI, dataset, refArea, refPeriod,
         # Loop through measureVariables to get measure Values -> stats:measureABCDEF "23.20144"^^xsd:decimal ;
         for (j in 2:length(data[1, ])) { # gibt measureVariable in Grossbuchstaben aus & hängt passender obsValue an
             statsData <- paste0(statsData, "
-                stats:measure",toupper(colnames(data)[j])," \"", data[i, j], "\"^^xsd:decimal ;
+                stats:measure \"", data[i, j], "\"^^xsd:decimal ;
             ")
         }
         statsData <- paste0(statsData, "
@@ -60,24 +58,12 @@ sparqlUpdateGroupedBarPlot <- function(analysisURI, dataset, refArea, refPeriod,
         )
     }
 
-# TODO: gibt kein modelsData in analysis.R -> daher ev. löschen
-    statsSummary <- paste0("<", analysisURI, ">")
-    for (i in 1:length(analysis$modelsData[, 1])) {
-        statsSummary <- paste0(statsSummary, "
-            stats:summary [
-                a stats:Summary ;
-                stats:n \"", analysis$modelsData[i, 'n'], "\"^^xsd:double
-            ] ;"
-        )
-    }
-# TODO: Ende ev. löschen
-
     statsSummary <- paste0("<", analysisURI, ">") # Abschnitt hinzugefügt
     for (i in 2:length(analysis$meta[, 1])) {
         statsSummary <- paste0(statsSummary, "
             stats:summary [
                 a stats:Summary ;
-                stats:dataset",toupper(colnames(data)[i])," <", dataset[i], "> ;
+                stats:dataset <", dataset[i], "> ;
                 stats:min \"", analysis$meta$minValues[i], "\"^^xsd:decimal ; 
                 stats:q1 \"", analysis$meta$q1Values[i], "\"^^xsd:decimal ;
                 stats:mean \"", analysis$meta$meanValues[i], "\"^^xsd:decimal ;
@@ -172,7 +158,7 @@ INSERT DATA {
         # Loop through measureVariables to retrieve Dataset names -> stats:datasetABCDEF <http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS> ;
         for (i in 2:length(data[1, ])) { # 2:length(data[1, ]) = Amount of measureVariables
             query <- paste0(query, "
-                stats:dataset",toupper(colnames(data)[i])," <", dataset[i], "> ;
+                stats:dataset <", dataset[i], "> ;
             ")
         }
         # Loop through obsValues to retrieve all refAreas names and adds namespace from Worldbank in order to get URI
@@ -222,8 +208,8 @@ SELECT *
 WHERE {
     GRAPH <http://stats.270a.info/graph/analysis> {
         <", analysisURI, ">
-            stats:dataset ?dataset ; # datasetX zu dataset
-            stats:refArea ?refArea ; # TODO: refArea entfernen
+            stats:dataset ?dataset ; 
+            stats:refArea ?refArea ; 
             stats:refPeriod ?refPeriod ;
             stats:graph ?graph ;
             stats:n ?n ;
@@ -255,8 +241,6 @@ sparqlQueryGroupedBarPlot <- function(dataset, refArea, refPeriod) { # refPeriod
 sparqlQueryStringGroupedBarPlot <- function(dataset, refArea, refPeriod) { # refPeriod & datasetY hinzugefügt & datasetX zu dataset
 
     d <- strsplit(c(d = dataset), ",") # teilt unterschiedliche Datasets in URL bei ","
-    # print(d$d[1]) # worldbank:SE.XPD.PRIM.PC.ZS
-    # print(d$d[2]) # worldbank:SE.XPD.SECO.PC.ZS
 
     endpoints = ''
     datasetNames = ''
@@ -278,13 +262,6 @@ sparqlQueryStringGroupedBarPlot <- function(dataset, refArea, refPeriod) { # ref
 
     # TODO: ev. noch ergänzen, da auch Möglichkeit, dass nur ein oder zwei Datasets exitieren 
     #if (datasetNameX != datasetX && datasetNameY != datasetY && datasetNameZ != datasetZ) { # ganzer Block hinzugefügt (3 Zeilen & obere 2 Zeilen auskommentiert)
-    #TODO: if gestalten, dass für alle Datasets Kombinationen funktioniert
-   # if (datasetNameX != datasetX && datasetNameY != datasetY) {
-   #     endpointX <- sparqlEndpoints[datasetNameX]
-   #     endpointY <- sparqlEndpoints[datasetNameY]
-   #     #endpointZ <- sparqlEndpoints[datasetNameZ]
-
-        
         
     # Splits refAreas at "," & writes them in Vector
     s <- strsplit(c(s = refArea), ",") # trennt refArea, wo "," sind & schreibt in Vector -> refArea besteht aus allen refAreas in URL

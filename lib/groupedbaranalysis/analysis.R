@@ -12,12 +12,12 @@ getAnalysisGroupedBarPlot <- function(dataset, refArea, refPeriod, data) { # ref
     # Generates variables for summary for each Dataset
     for (i in 2:length(data[1, ])) { # 2:length(data[1, ]) = Amount of measureVariables
         q <- quantile(data[ ,i])
-        min <- round(q[1], digits=2)
-        q1 <- round(q[2], digits=2)      
-        mean <- round(q[3], digits=2)
-        q3 <- round(q[4], digits=2) 
-        max <- round(q[5], digits=2)
-        median <- round(median(data[ ,i]), digits = 2)
+        min <- q[1]
+        q1 <- q[2]     
+        mean <- q[3]
+        q3 <- q[4]
+        max <- q[5]
+        median <- median(data[ ,i])
 
         minValues <- append(minValues, min)
         q1Values <- append(q1Values, q1)
@@ -51,43 +51,25 @@ outputPlotGroupedBarPlot <- function(analysis) {
         }
         dataset <- ds # dataset ist Vector bestehend aus allen Datasets [2]http://worldbank.../../SE.XPD.PRIM.PC.ZS [3]http://worldbank.../../SE.XPD.SECO.PC.ZS 
 
-    
-        print(paste0("DATASETLABELS: ", datasetLabel))
-        #print(analysis$datasetX)
-        print(analysis$dataset)
-        print(paste0("DATASETX analysis: ", analysis$dataset[[1]][1]))   
-        print(paste0("DATASETY analysis: ", analysis$dataset[[1]][2])) 
-        print(analysis$refArea)
-        print(analysis$refPeriod)
-        print(analysis$data)
-        #print(analysis$data$x)
+        # Generates refArea Labels which will be used to label plot
+        r <- strsplit(c(r = analysis$refArea), ",")
+        refAreaLabel = ''
+        for (i in 1:length(r$r)) { # 1:length(r$r) = Amount of refAreas
+            rAL <- paste0(r$r[i])
+            refAreaLabel <- append(refAreaLabel, resourceLabels[rAL])
+        }
+        refAreaLabels <- paste0(refAreaLabel[2:length(refAreaLabel)])
 
 
         if (is.null(analysis$meta$graph)) {
             plotPath <- paste0("plots/", analysis$id, ".svg") # erstellt Pfadname des Plots
 
-            print("test1")
-
             # Plot doesn't exists in directory
             if (!file.exists(paste0("www/", plotPath))) { # wenn nicht auskommentiert, springt gar nicht in File, da Plot schon existiert, aber leer
-
-                print("test2")                
-
+        
                 data <- analysis$data
                 x <- data$x
                 refArea <- resourceLabels[analysis$refArea] # resourceLabels in /var/shiny-server/www/lsd-analysis/lib/resourceLabels.R -> dort Länder ergänzen
-
-                print(paste0("DATASET X Label: ", datasetLabel[2]))
-                #print(paste0("ANALYSIS DATASET X: ", analysis$datasetX))
-                print("test3")
-                print(data)
-                print(data[1,2])
-                print(paste0("analysis$refArea: ", analysis$refArea))
-                print(data$refArea)
-                print(paste0("REFAREA1: ", data$refArea[1]))
-                print(paste0("DATASETX data: ", data$dataset))
-                print(data$x)
-
 
                 # Creates Grouped Bar Plot
 
@@ -100,26 +82,24 @@ outputPlotGroupedBarPlot <- function(analysis) {
                 
                 # Puts together the Plot Title that will be shown above the plot
                 plotTitle = ''
-                for (i in 2:length(datasetLabel))
-                {
+                for (i in 2:length(datasetLabel)) {
                     pT <- datasetLabel[i]
                     if (i == 2) { 
                         plotTitle <- paste(plotTitle, pT, sep="") # if just one Dataset was selected, the Labels won't be separated
                     }
-                    else
-                    {
+                    else {
                         plotTitle <- paste(plotTitle, pT, sep=" and \n") # multiple Datasets will be separated with an "and"
                     }
                 }
+               
 
                 # Melts obsValues from CSV file into one column in a Data Frame, which is necessary to output a Grouped Bar Plot
-                df = data.frame(refArea=data$refArea, obsValues[2:length(obsValues)])
+                df = data.frame(refArea=refAreaLabels, obsValues[2:length(obsValues)])
                 colnames(df) <- c("refArea", datasetLabel[2:length(datasetLabel)]) # benennt Spaltenname, welche für Plot benötigt werden
                 plotData <- melt(df, id=c(df$refArea), id.vars=1)
 
                 # Creates Grouped Bar Plot
                 g <- ggplot(plotData, environment = environment(), aes(x=refArea, y=value, fill=variable)) + geom_bar(stat="identity", position="dodge") + labs(list(x="Reference Area", y="Value", fill="Datasets", title=plotTitle)) + theme(legend.position="bottom") + geom_text(aes(label=value), position=position_dodge(width=0.9), vjust=-0.25)
-
 
                 g <- g + annotate("text", x=Inf, y=Inf, label="270a.info", hjust=1.3, vjust=2, color="#0000E4", size=4)
 
@@ -169,7 +149,6 @@ outputAnalysisSummaryGroupedBarPlot <- function(analysis) {
             <table id=\"lsd-analysis-results-quantile\">
                 <caption>Analysis results</caption>
                 <tbody>
-                    <tr><th></th><td colspan='6'>* Values are rounded to two decimal places</caption></td></tr>
                     <tr><th></th><th>Min</th><th>Q1</th><th>Mean</th><th>Q3</th><th>Max</th><th>Median</th></tr>
         "))
         # Generates a row for each Dataset and outputs variables for summary

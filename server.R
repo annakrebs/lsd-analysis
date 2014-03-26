@@ -49,9 +49,11 @@ shinyServer(function(input, output, session) {
 
         paths <- paths()
 
+        # TODO: if no values are chosen "argument is of length zero" appears -> remove message
         if(length(paths) == 2) {
             return(NULL)
         }
+
 
         switch(paste0("case", length(paths)),
             #Regression Analysis http://stats.270a.info/analysis/worldbank:SP.DYN.IMRT.IN/transparency:CPI2009/year:2009.html
@@ -70,17 +72,12 @@ shinyServer(function(input, output, session) {
 
             #Time Series http://localhost.stats.270a.info/analysis/worldbank:SP.DYN.IMRT.IN/wbcountry:CH.html
             case4={
-                print ("test")
                 s <- strsplit(c(s = paths[3]), ":")
-                print(s)
                 datasetX <- paste0(namespaces[s$s[1]], s$s[2])
                 s <- strsplit(c(s = paths[4]), ":")
                 refArea <- paste0(namespaces[s$s[1]], s$s[2])
 #cat(paste0("paths: ", paths, " s: ", s, " refArea:", refArea ,"--"), file=stderr())
                 analysisParams = paste0(datasetX, refArea)
-                print(datasetX)
-                print(refArea)
-                print(analysisParams)
 
                 analysisSummary <- sQGASTimeSeries(analysisURI)
             },
@@ -107,10 +104,6 @@ shinyServer(function(input, output, session) {
                 }
 
                 analysisParams = paste0(dataset, refArea, refPeriod) # refPeriod & datasetY hinzugefügt & datasetX zu dataset
-
-                print(paste0(paste="ALL Reference Areas: ", refArea))
-                print(refPeriod)
-                print(analysisParams)
 
                 analysisSummary <- sQGASGroupedBarPlot(analysisURI)
             },
@@ -153,7 +146,6 @@ shinyServer(function(input, output, session) {
                 },
                 #Grouped Bar Plot
                 case6={
-                    print("Exists in store")
                     meta <- data.frame("n"= nrow(data), "minValues"=analysisSummary$minValues, "q1Values"=analysisSummary$q1Values, "meanValues"=analysisSummary$meanValues, "q3Values"=analysisSummary$q3Values, "maxValues"=analysisSummary$maxValues, "medianValues"=analysisSummary$medianValues, "graph"=analysisSummary$graph) 
                     #meta <- data.frame("n"=analysisSummary$n, "graph"=analysisSummary$graph)
 
@@ -181,9 +173,6 @@ shinyServer(function(input, output, session) {
                 },
                 #Grouped Bar Plot
                 case6={
-                    print("Query analysis")
-                    print(refPeriod)
-
                     # übergibt Daten an sparqlQueryStringGroupedBarPlot(....) in sparql.R
                     data <- sQGroupedBarPlot(dataset, refArea, refPeriod) # refPeriod & datasetY hinzugefügt & datasetX zu dataset      
                 },
