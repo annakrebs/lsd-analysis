@@ -1,8 +1,10 @@
+// sets values in input fields when page is loaded 
 $(document).ready(function(){
-    var href = window.location.href.match(new RegExp(window.location.protocol + "\/\/" + window.location.hostname + "\/analysis\/([^\/]*)\/([^\/]*)\/([^\.]*).html"));
+     var href = window.location.href.match(new RegExp(window.location.protocol + "\/\/" + window.location.hostname + "\/analysis/dev\/([^\/]*)\/([^\/]*)\/([^\.]*).html")); // gets URI
 
-    if(href != null) {
+    if(href != null) { // URI contains analysis elements
         switch(href.length) {
+
             case 3:
                 var domainX = href[1].split(":")[0];
                 var domainY = href[2].split(":")[0];
@@ -18,7 +20,8 @@ $(document).ready(function(){
                 $(".entry-content").css("background", "url(/theme/default/images/icons/icon_loading.gif) no-repeat 65% 100px");
                 break;
 
-            case 4:
+            // TODO: Regression Analysis & Grouped Bar Analysis are both case 4
+/*            case 4:
                 var domainX = href[1].split(":")[0];
                 var domainY = href[2].split(":")[0];
                 var domainZ = href[3].split(":")[0];
@@ -36,6 +39,53 @@ $(document).ready(function(){
 
                 $(".entry-content").css("background", "url(/theme/default/images/icons/icon_loading.gif) no-repeat 65% 100px");
                 break;
+*/
+            // Grouped Bar Analysis
+            case 4:
+                // sets values of "Datasets" & "Selected Datasets" selection lists according to values in URI
+                var datasets = href[1].split(","); // splits datasets at ","
+    
+                for (var i = 0; i < datasets.length; i++) {
+                    var domain = datasets[i].split(":")[0]; // "worldbank"
+                    var d = datasets[i].split(":")[1]; // "SE.XPD.PRIM.PC.ZS"
+
+                    var dataset = "http://" + domain + ".270a.info/dataset/" + d
+                    $("#datasets").val(dataset); // selects values of URI in "Datasets" selection list -> $("#datasets") = id of select in html
+                    var datsetText = $("#datasets option:selected").html(); // gets text of selected dataset -> "Expenditure per student, primary (% of GDP per capita)"
+
+                    var option = document.createElement("option");
+                    option.text = datsetText; // -> "Expenditure per student, primary (% of GDP per capita)"
+                    option.value = dataset; // -> "http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS"
+                    selectedDatasets.add(option); // adds the text of the URI datasets to selection list "Selected Datasets"
+
+                    $("#datasets option:selected").remove(); // removes the text of the URI datasets from selection list "Datasets"
+                }
+
+                // sets values of "Reference Areas" & "Selected Reference Areas" selection lists according to values in URI
+                var refAreas = href[2].split(","); // splits refAreas at ","
+
+                for (var i = 0; i < refAreas.length; i++) {
+                    var rA = refAreas[i]; // "CH"
+                    var refArea = "http://worldbank.270a.info/classification/country/" + rA
+
+                    $("#refAreas").val(refArea); // selects values of URI in "Reference Area" selection list 
+                    var refAreaText = $("#refAreas option:selected").html(); // gets text of selected refAreas -> "Switzerland"
+
+                    var option = document.createElement("option");
+                    option.text = refAreaText; // -> "Switzerland"
+                    option.value = refArea; // -> "http://worldbank.270a.info/classification/country/CH"
+                    selectedRefAreas.add(option); // adds the text of the URI refAreas to selection list "Selected Reference Areas"
+
+                    $("#refAreas option:selected").remove(); // removes the text of the URI refAreas from selection list "Reference Areas"
+                }
+                
+                // sets "Reference Period" slider & text according to value in URI
+                var refPeriod = href[3];
+                $("#sliderRefPeriod").val(refPeriod);
+                document.getElementById("rP").innerHTML = refPeriod;
+
+                break;
+
 
             default:
                 break;
@@ -59,6 +109,7 @@ $(document).ready(function(){
     $('#download-csv a').on('click', function() {
         $("body").removeClass();
     });
+
 });
 
 
@@ -209,9 +260,7 @@ function getSelectedValues() {
     var refPeriodString = document.getElementById("rP").innerHTML;
 
     // concatenates URI
-    // TODO: values in "Selected Datasets", "Selected Reference Areas" & "Reference Period" are being reseted when page is loaded newly
     window.location.href = window.location.protocol + "//" + window.location.hostname + "/analysis/" + "dev/" + datasetsString + "/" + refAreasString + "/" + refPeriodString;
-    //window.location.href = "http://localhost.stats.270a.info/analysis/dev/" + datasetsString + "/" + refAreasString + "/" + refPeriodString; 
 
 }
 

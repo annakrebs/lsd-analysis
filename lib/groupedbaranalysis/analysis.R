@@ -144,21 +144,34 @@ outputAnalysisSummaryGroupedBarPlot <- function(analysis) {
 
 
         # Creates Summary
+
+
         o <- HTML(paste0("
 
             <table id=\"lsd-analysis-results-quantile\">
                 <caption>Analysis results</caption>
                 <tbody>
-                    <tr><th></th><th>Min</th><th>Q1</th><th>Mean</th><th>Q3</th><th>Max</th><th>Median</th></tr>
+                    
         "))
         # Generates a row for each Dataset and outputs variables for summary
             # analysis$meta$min[i] defined in getAnalysisGroupedBarPlot(...)
         for (i in 2:length(data[1, ])) { # 2:length(data[1, ]) = Amount of measureVariables        
             o <- HTML(paste0(o, "
-                <tr><td><a href=\"", dataset[i], "\">", datasetLabel[i] ,"</a></td>
-                    <td>", analysis$meta$min[i], "</td><td>", analysis$meta$q1[i], "</td><td>", analysis$meta$mean[i], "</td><td>", analysis$meta$q3[i], "</td><td>", analysis$meta$max[i], "</td><td>", analysis$meta$median[i], "</td></tr>
+                <tr><td rowspan=4><a href=\"", dataset[i], "\">", datasetLabel[i] ,"</a></td>
+                    <th>Min</th><th>Q1</th><th>Mean</th>
+                </tr>
+                <tr>
+                    <td>", analysis$meta$min[i], "</td><td>", analysis$meta$q1[i], "</td><td>", analysis$meta$mean[i], "</td>
+                </tr>
+                <tr>
+                    <th>Q3</th><th>Max</th><th>Median</th>
+                </tr>
+                <tr>
+                    <td>", analysis$meta$q3[i], "</td><td>", analysis$meta$max[i], "</td><td>", analysis$meta$median[i], "</td>
+                </tr>
             "))
         }
+
 
         o <- HTML(paste0(o, "
                 </tbody>

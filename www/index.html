@@ -55,13 +55,12 @@
                     <div id="content_inner">
                         <div class="entry-content">
 
-<!--<form action="http://localhost.stats.270a.info/analysis/dev/" method="post">-->
 <form action="" id="form_analysis" class="well">
 
     <!-- Selection of the Datasets -->
 
-    <label class="datasets-label" for="dataset">Datasets</label>
-    <select id="datasets" multiple size="10" name="datasets" style="width: 200px">
+    <label class="control-label" for="dataset">Datasets</label>
+    <select id="datasets" class="selection-list" multiple size="7" name="datasets">
         <optgroup label="World Bank">
         <option value="http://worldbank.270a.info/dataset/allsi.lekbf_q1" onmouseover="window.status=this.value" title="% benefits held by non poor -All Social Insurance" >% benefits held by non poor -All Social Insurance</option>
         <option value="http://worldbank.270a.info/dataset/allsp.lekbf_q1" onmouseover="window.status=this.value" title="% benefits held by non poor -All Social Protection" >% benefits held by non poor -All Social Protection</option>
@@ -76,18 +75,18 @@
         </optgroup>
     </select>
 
-    <button id="select-dataset" type="button" onclick="addDataset()" value="Submit"> > </button></br>
-    <button id="deselect-dataset" type="button" onclick="removeDataset()" value="Submit"> < </button>
+    <button id="select-dataset" type="button" class="btn-select" onclick="addDataset()" value="Submit"> > </button>
+    <button id="deselect-dataset" type="button" class="btn-select" onclick="removeDataset()" value="Submit"> < </button>
 
-    <label class="datasets-label" for="dataset">Selected Datasets</label>
-    <select name="selectedDatasets" id="selectedDatasets" multiple size="10" style="width: 200px">
+    <label class="control-label" for="dataset">Selected Datasets</label>
+    <select id="selectedDatasets" class="selection-list" multiple size="7" name="selectedDatasets">
     </select>
 
 
     <!-- Selection of the Reference Areas -->
 
-    <label class="refAreas-label" for="refAreas">Reference Areas</label>
-    <select id="refAreas" multiple size="10" name="refAreas" style="width: 200px">
+    <label class="control-label" for="refAreas">Reference Areas</label>
+    <select id="refAreas" class="selection-list" multiple size="7" name="refAreas">
         <option value="http://worldbank.270a.info/classification/country/AU">Australia</option>
         <option value="http://worldbank.270a.info/classification/country/FR">France</option>
         <option value="http://worldbank.270a.info/classification/country/IT">Italy</option>
@@ -95,23 +94,25 @@
         <option value="http://worldbank.270a.info/classification/country/US">United States</option>
     </select>
 
-    <button id="select-refArea" type="button" class="btn btn-primary" onclick="addRefArea()"> > </button> </br>
-    <button id="deselect-refArea" type="button" class="btn btn-primary" onclick="removeRefArea()"> < </button>
+    <button id="select-refArea" type="button" class="btn-select" onclick="addRefArea()"> > </button>
+    <button id="deselect-refArea" type="button" class="btn-select" onclick="removeRefArea()"> < </button>
 
-    <label class="selected-refAreas-label" for="selected-refAreas">Selected Reference Areas</label>
-    <select id="selectedRefAreas" multiple size="10" name="selectedRefAreas" style="width: 200px">
+    <label class="control-label" for="selected-refAreas">Selected Reference Areas</label>
+    <select id="selectedRefAreas" class="selection-list" multiple size="7" name="selectedRefAreas">
     </select>
+
+    <button id="reset" type="reset">Clear selection</button>
 
 
     <!-- Selection of the Reference Period -->
 
-    <label class="refPeriod-label" for="refPeriod">Reference Period</label>
-    <span id="rP">2007</span> <!-- displays value of selected refArea -> function showRefPeriod(...) -->
-    <input type="range" id="sliderBar" autocomplete="off" min="2000" max="2013" step="1" value="2007" onChange="showRefPeriod(this.value);"/> 
+    <label class="control-label" for="refPeriod">Reference Period</label>
+    <span id="rP">2007</span></br> <!-- displays value of selected refArea -> function showRefPeriod(...) -->
+    <input type="range" id="sliderRefPeriod"  min="2000" max="2013" step="1" value="2007" onChange="showRefPeriod(this.value);"/> 
 
-    <button id="reset" type="reset">Clear selection</button>
 
     <button id="analyze" type="submit" class="btn btn-primary" onclick="getSelectedValues()"> Analyze </button>
+</form>
 
     <div id="plot" class="shiny-html-output" style="width:60%;"></div>
 
