@@ -67,6 +67,11 @@
         <option value="http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS" onmouseover="window.status=this.value" title="Expenditure per student, primary (% of GDP per capita)" >Expenditure per student, primary (% of GDP per capita)</option>
         <option value="http://worldbank.270a.info/dataset/SE.XPD.SECO.PC.ZS" onmouseover="window.status=this.value" title="Expenditure per student, secondary (% of GDP per capita)" >Expenditure per student, secondary (% of GDP per capita)</option>
         <option value="http://worldbank.270a.info/dataset/SE.XPD.TERT.PC.ZS" onmouseover="window.status=this.value" title="Expenditure per student, tertiary (% of GDP per capita)" >Expenditure per student, tertiary (% of GDP per capita)</option>
+        <option value="http://worldbank.270a.info/dataset/SL.TLF.TOTL.FE.IN" onmouseover="window.status=this.value" title="Labor force, female">Labor force, female</option>
+        <option value="http://worldbank.270a.info/dataset/SL.TLF.TOTL.FE.ZS" onmouseover="window.status=this.value" title="Labor force, female (% of total labor force)">Labor force, female (% of total labor force)</option>
+        <option value="http://worldbank.270a.info/dataset/SL.TLF.TOTL.MA.IN" onmouseover="window.status=this.value" title="Labor force, male">Labor force, male</option>
+        <option value="http://worldbank.270a.info/dataset/SL.TLF.TOTL.MA.ZS" onmouseover="window.status=this.value" title="Labor force, male (% of total labor force)">Labor force, male (% of total labor force)</option>
+        <option value="http://worldbank.270a.info/dataset/SL.TLF.TOTL.IN" onmouseover="window.status=this.value" title="Labor force, total">Labor force, total</option>
 
         <optgroup label="Transparency International">
         <option value="http://transparency.270a.info/dataset/CPI2009" onmouseover="window.status=this.value" title="Corruption Perceptions Index 2009" >Corruption Perceptions Index 2009</option>
@@ -75,6 +80,7 @@
         </optgroup>
     </select>
 
+    <!--<input id="select-dataset" type="image" class="btn-select" onclick="addDataset()" value="Submit" src="/theme/default/images/icons/icon_arrow_up.gif">-->
     <button id="select-dataset" type="button" class="btn-select" onclick="addDataset()" value="Submit"> > </button>
     <button id="deselect-dataset" type="button" class="btn-select" onclick="removeDataset()" value="Submit"> < </button>
 
@@ -87,7 +93,11 @@
 
     <label class="control-label" for="refAreas">Reference Areas</label>
     <select id="refAreas" class="selection-list" multiple size="7" name="refAreas">
+        <option value="http://worldbank.270a.info/classification/country/DZ">Algeria</option>
         <option value="http://worldbank.270a.info/classification/country/AU">Australia</option>
+        <option value="http://worldbank.270a.info/classification/country/BF">Burkina Faso</option>
+        <option value="http://worldbank.270a.info/classification/country/EG">Egypt, Arab Rep.</option>
+        <option value="http://worldbank.270a.info/classification/country/CD">Congo, Dem. Rep.</option>
         <option value="http://worldbank.270a.info/classification/country/FR">France</option>
         <option value="http://worldbank.270a.info/classification/country/IT">Italy</option>
         <option value="http://worldbank.270a.info/classification/country/CH">Switzerland</option>

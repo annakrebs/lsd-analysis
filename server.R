@@ -50,7 +50,7 @@ shinyServer(function(input, output, session) {
         paths <- paths()
 
         # TODO: if no values are chosen "argument is of length zero" appears -> remove message
-        if(length(paths) == 2) {
+        if(length(paths) == 2 || length(paths) == 3) {
             return(NULL)
         }
 
@@ -224,7 +224,7 @@ shinyServer(function(input, output, session) {
     output$plot <- renderPrint({
         paths <- paths()
 
-        if(length(paths) != 2) {
+        if(length(paths) != 2 && length(paths) != 3) {
             analysis <- getData()
 
             switch(paste0("case", length(paths)),
@@ -251,7 +251,7 @@ shinyServer(function(input, output, session) {
     output$statsSummary <- renderPrint({
         paths <- paths()
 
-        if(length(paths) != 2) {
+        if(length(paths) != 2 && length(paths) != 3) {
             analysis <- getData()
 cat(paste0(analysis), file=stderr())
             switch(paste0("case", length(paths)),

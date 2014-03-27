@@ -101,6 +101,9 @@ outputPlotGroupedBarPlot <- function(analysis) {
                 # Creates Grouped Bar Plot
                 g <- ggplot(plotData, environment = environment(), aes(x=refArea, y=value, fill=variable)) + geom_bar(stat="identity", position="dodge") + labs(list(x="Reference Area", y="Value", fill="Datasets", title=plotTitle)) + theme(legend.position="bottom") + geom_text(aes(label=value), position=position_dodge(width=0.9), vjust=-0.25)
 
+                # TODO: Stacked Plot
+                #g <- ggplot(plotData, environment = environment(), aes(x=refArea, y=value, fill=variable)) + geom_bar(stat="identity", position="stack") + labs(list(x="Reference Area", y="Value", fill="Datasets", title=plotTitle)) + theme(legend.position="bottom") + geom_text(aes(label=value), position=position_dodge(width=0.9), vjust=-0.25)
+
                 g <- g + annotate("text", x=Inf, y=Inf, label="270a.info", hjust=1.3, vjust=2, color="#0000E4", size=4)
 
                 ggsave(plot=g, file=paste0("www/", plotPath), width=7, height=7)
