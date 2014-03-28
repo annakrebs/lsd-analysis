@@ -1,3 +1,11 @@
+<!-- 
+ @author         Anna-Barbara Krebs
+ @name           index.html   
+ @date           xx.xx.xxxx     
+ @fileOverview   HTML document for the representation of the Grouped Bar Analysis.
+                 The style and functions are being specified in display.css and index.js.
+-->
+
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -60,7 +68,7 @@
     <!-- Selection of the Datasets -->
 
     <label class="control-label" for="dataset">Datasets</label>
-    <select id="datasets" class="selection-list" multiple size="7" name="datasets">
+    <select id="datasets" class="selection-list" multiple size="2" name="datasets">
         <optgroup label="World Bank">
         <option value="http://worldbank.270a.info/dataset/allsi.lekbf_q1" onmouseover="window.status=this.value" title="% benefits held by non poor -All Social Insurance" >% benefits held by non poor -All Social Insurance</option>
         <option value="http://worldbank.270a.info/dataset/allsp.lekbf_q1" onmouseover="window.status=this.value" title="% benefits held by non poor -All Social Protection" >% benefits held by non poor -All Social Protection</option>
@@ -95,11 +103,14 @@
     <select id="refAreas" class="selection-list" multiple size="7" name="refAreas">
         <option value="http://worldbank.270a.info/classification/country/DZ">Algeria</option>
         <option value="http://worldbank.270a.info/classification/country/AU">Australia</option>
+        <option value="http://worldbank.270a.info/classification/country/BR">Brazil</option>
         <option value="http://worldbank.270a.info/classification/country/BF">Burkina Faso</option>
         <option value="http://worldbank.270a.info/classification/country/EG">Egypt, Arab Rep.</option>
         <option value="http://worldbank.270a.info/classification/country/CD">Congo, Dem. Rep.</option>
         <option value="http://worldbank.270a.info/classification/country/FR">France</option>
         <option value="http://worldbank.270a.info/classification/country/IT">Italy</option>
+        <option value="http://worldbank.270a.info/classification/country/JP">Japan</option>
+        <option value="http://worldbank.270a.info/classification/country/SE">Sweden</option>
         <option value="http://worldbank.270a.info/classification/country/CH">Switzerland</option>
         <option value="http://worldbank.270a.info/classification/country/US">United States</option>
     </select>
@@ -117,7 +128,7 @@
     <!-- Selection of the Reference Period -->
 
     <label class="control-label" for="refPeriod">Reference Period</label>
-    <span id="rP">2007</span></br> <!-- displays value of selected refArea -> function showRefPeriod(...) -->
+    <span id="rP">2007</span></br> <!-- displays value of selected refPeriod -> function showRefPeriod(...) -->
     <input type="range" id="sliderRefPeriod"  min="2000" max="2013" step="1" value="2007" onChange="showRefPeriod(this.value);"/> 
 
 

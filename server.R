@@ -49,14 +49,14 @@ shinyServer(function(input, output, session) {
 
         paths <- paths()
 
-        # TODO: if no values are chosen "argument is of length zero" appears -> remove message
+        # TODO: if no values are chosen (http://localhost.stats.270a.info/analysis/dev) "argument is of length zero" is outputed
         if(length(paths) == 2 || length(paths) == 3) {
             return(NULL)
         }
 
 
         switch(paste0("case", length(paths)),
-            #Regression Analysis http://stats.270a.info/analysis/worldbank:SP.DYN.IMRT.IN/transparency:CPI2009/year:2009.html
+            #Regression Analysis
             case5={
                 s <- strsplit(c(s = paths[3]), ":")
                 datasetX <- paste0(namespaces[s$s[1]], s$s[2])
@@ -70,7 +70,7 @@ shinyServer(function(input, output, session) {
                 analysisSummary <- sQGASRegression(analysisURI)
             },
 
-            #Time Series http://localhost.stats.270a.info/analysis/worldbank:SP.DYN.IMRT.IN/wbcountry:CH.html
+            #Time Series 
             case4={
                 s <- strsplit(c(s = paths[3]), ":")
                 datasetX <- paste0(namespaces[s$s[1]], s$s[2])
@@ -82,7 +82,7 @@ shinyServer(function(input, output, session) {
                 analysisSummary <- sQGASTimeSeries(analysisURI)
             },
 
-            #Grouped Bar Plot Analysis http://localhost.stats.270a.info/analysis/dev/worldbank:SE.XPD.PRIM.PC.ZS/CA,FR/2009.html
+            #Grouped Bar Analysis
             case6={
 
                 # datasets (datasets are split in sparql.R)
@@ -103,7 +103,7 @@ shinyServer(function(input, output, session) {
                     refPeriod <- paths[6]
                 }
 
-                analysisParams = paste0(dataset, refArea, refPeriod) # refPeriod & datasetY hinzugefügt & datasetX zu dataset
+                analysisParams = paste0(dataset, refArea, refPeriod)
 
                 analysisSummary <- sQGASGroupedBarPlot(analysisURI)
             },
@@ -138,18 +138,17 @@ shinyServer(function(input, output, session) {
 
                     analysis <- list("datasetX"=datasetX, "datasetY"=datasetY, "refPeriod"=refPeriod, "data"=data, "meta"=meta, "id"=id)
                 },
-                #Time Series
+                #Time Series 
                 case4={
                     meta <- data.frame("n"=analysisSummary$n, "graph"=analysisSummary$graph)
 
                     analysis <- list("datasetX"=datasetX, "refArea"=refArea, "data"=data, "meta"=meta, "id"=id)
                 },
-                #Grouped Bar Plot
+                #Grouped Bar Analysis
                 case6={
                     meta <- data.frame("n"= nrow(data), "minValues"=analysisSummary$minValues, "q1Values"=analysisSummary$q1Values, "meanValues"=analysisSummary$meanValues, "q3Values"=analysisSummary$q3Values, "maxValues"=analysisSummary$maxValues, "medianValues"=analysisSummary$medianValues, "graph"=analysisSummary$graph) 
-                    #meta <- data.frame("n"=analysisSummary$n, "graph"=analysisSummary$graph)
 
-                    analysis <- list("dataset"=dataset, "refArea"=refArea, "refPeriod"=refPeriod, "data"=data, "meta"=meta, "id"=id) # refPeriod & datasetY hinzugefügt & datasetX zu dataset
+                    analysis <- list("dataset"=dataset, "refArea"=refArea, "refPeriod"=refPeriod, "data"=data, "meta"=meta, "id"=id) 
                 },
                 {}
             )
@@ -167,14 +166,14 @@ shinyServer(function(input, output, session) {
                 case5={
                     data <- sQRegression(datasetX, datasetY, refPeriod)
                 },
-                #Time Series
+                #Time Series 
                 case4={
                     data <- sQTimeSeries(datasetX, refArea)
                 },
-                #Grouped Bar Plot
+                #Grouped Bar Analysis
                 case6={
-                    # übergibt Daten an sparqlQueryStringGroupedBarPlot(....) in sparql.R
-                    data <- sQGroupedBarPlot(dataset, refArea, refPeriod) # refPeriod & datasetY hinzugefügt & datasetX zu dataset      
+                    # renders thata to sparqlQueryStringGroupedBarPlot(....) in sparql.R
+                    data <- sQGroupedBarPlot(dataset, refArea, refPeriod)     
                 },
                 {}
 
@@ -194,19 +193,19 @@ shinyServer(function(input, output, session) {
                         #Update store
                         storeUpdated <- sURegression(analysisURI, datasetX, datasetY, refPeriod, data, analysis)
                     },
-                    #Time Series
+                    #Time Series 
                     case4={
                         #Build analysis
                         analysis <- getAnalysisTimeSeries(datasetX, refArea, data)
                         #Update store
                         storeUpdated <- sUTimeSeries(analysisURI, datasetX, refArea, data, analysis)
                     },
-                  #Grouped Bar Plot
+                  #Grouped Bar Analysis
                     case6={
                         #Build analysis
-                        analysis <- getAnalysisGroupedBarPlot(dataset, refArea, refPeriod, data) # refPeriod & datasetY hinzugefügt & datasetX zu dataset
+                        analysis <- getAnalysisGroupedBarPlot(dataset, refArea, refPeriod, data)
                         #Update store
-                        storeUpdated <- sUGroupedBarPlot(analysisURI, dataset, refArea, refPeriod, data, analysis) # refPeriod & datasetY hinzugefügt & datasetX zu dataset
+                        storeUpdated <- sUGroupedBarPlot(analysisURI, dataset, refArea, refPeriod, data, analysis) 
                     },
                     {}
                 )
@@ -232,11 +231,11 @@ shinyServer(function(input, output, session) {
                 case5={
                     outputPlotRegression(analysis)
                 },
-                #Time Series
+                #Time Series 
                 case4={
                     outputPlotTimeSeries(analysis)
                 },
-                #Grouped Bar Plot
+                #Grouped Bar Analysis
                 case6={
                     outputPlotGroupedBarPlot(analysis)
                 },
@@ -263,7 +262,7 @@ cat(paste0(analysis), file=stderr())
                 case4={
                     outputAnalysisSummaryTimeSeries(analysis)
                 },
-                #Grouped Bar Plot
+                #Grouped Bar Analysis
                 case6={
                     outputAnalysisSummaryGroupedBarPlot(analysis)
                 },

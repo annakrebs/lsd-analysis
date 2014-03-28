@@ -1,3 +1,10 @@
+/**
+ * @author         Sarven Capadisli, Anna-Barbara Krebs
+ * @name           index.js   
+ * @date           xx.xx.xxxx     
+ * @fileOverview   Contains the JavaScript functions that are called in the index.html
+ */
+
 // sets values in input fields when page is loaded 
 $(document).ready(function(){
      var href = window.location.href.match(new RegExp(window.location.protocol + "\/\/" + window.location.hostname + "\/analysis/dev\/([^\/]*)\/([^\/]*)\/([^\.]*).html")); // gets URI
@@ -113,7 +120,8 @@ $(document).ready(function(){
 });
 
 
-// Grouped Bar Plot functions
+
+// Grouped Bar Analysis functions
 
 // displays selected Reference Period
 function showRefPeriod(refPeriod) {
@@ -123,6 +131,8 @@ function showRefPeriod(refPeriod) {
 
 // adds datasets to "Selected Datasets" selection list
 function addDataset() {
+    // TODO: adds selected dataset at end of selection list and not at appropriate position
+
     var selectedDatasets = document.getElementById("selectedDatasets");
     var datasets = document.getElementById("datasets"); // gets the selected dataset of the "Datasets" selection list
 
@@ -147,7 +157,8 @@ function addDataset() {
 
 // removes datasets from "Selected Datasets" selection list
 function removeDataset() {
-    // TODO: adds deselected Dataset at end of selection list and not at the original position
+    // TODO: adds deselected dataset at end of selection list and not at the original position
+
     var datasets = document.getElementById("datasets");
     var selectedDatasets = document.getElementById("selectedDatasets"); // gets the selected dataset of the "Selected Datasets" selection list
 
@@ -173,6 +184,7 @@ function removeDataset() {
 // adds refAreas to "Selected Reference Areas" selection list
 function addRefArea() {
     // TODO: adds deselected refAreas at end of selection list and not at the original position
+
     var selectedRefAreas = document.getElementById("selectedRefAreas");
     var refAreas = document.getElementById("refAreas"); // gets the selected refArea of the "Reference Area" selection list
 
@@ -197,6 +209,8 @@ function addRefArea() {
 
 // removes refAreas from "Selected Reference Areas" selection list
 function removeRefArea() {
+    // TODO: adds selected dataset at end of selection list and not at appropriate position
+
     var refAreas = document.getElementById("refAreas");
     var selectedRefAreas = document.getElementById("selectedRefAreas"); // gets the selected refArea of the "Reference Area" selection list
 
@@ -218,25 +232,10 @@ function removeRefArea() {
     }
 }
 
+
 // concatenates all selected values (datasets, refAreas & refPeriod) for URI 
 function getSelectedValues() {
     
-    // concatenates refArea for URI -> 'CH,US'
-    var selectedRefAreas = document.getElementById("selectedRefAreas");
-    var refAreasString = "";
-    var i;
-    for (i = 0; i < selectedRefAreas.length; i++) { // concatenates all selected refAreas to use in URI
-        var refArea = selectedRefAreas[i].value;
-        var rA = refArea.split("270a.info/classification/country/").pop(); // splits string after country -> only gets 'CH' 
-
-        if(i == selectedRefAreas.length - 1) {
-            refAreasString = refAreasString + rA // doesn't set "," after last refArea value
-        }
-        else
-            refAreasString = refAreasString + rA + ","; // separates refAreas with ","
-    }
-
-
     // concatenates datasets for URI -> 'worldbank:SE.XPD.PRIM.PC.ZS,worldbank:SE.XPD.SECO.PC.ZS'
     var selectedDatasets = document.getElementById("selectedDatasets");
     var datasetsString = "";
@@ -255,6 +254,20 @@ function getSelectedValues() {
             datasetsString = datasetsString + prefix + ":" + ds + ","; // separates refAreas with ","
     }
 
+    // concatenates refArea for URI -> 'CH,US'
+    var selectedRefAreas = document.getElementById("selectedRefAreas");
+    var refAreasString = "";
+    var i;
+    for (i = 0; i < selectedRefAreas.length; i++) { // concatenates all selected refAreas to use in URI
+        var refArea = selectedRefAreas[i].value;
+        var rA = refArea.split("270a.info/classification/country/").pop(); // splits string after country -> only gets 'CH' 
+
+        if(i == selectedRefAreas.length - 1) {
+            refAreasString = refAreasString + rA // doesn't set "," after last refArea value
+        }
+        else
+            refAreasString = refAreasString + rA + ","; // separates refAreas with ","
+    }
 
     // refPeriod for URI
     var refPeriodString = document.getElementById("rP").innerHTML;
