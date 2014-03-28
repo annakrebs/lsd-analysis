@@ -338,9 +338,10 @@ sparqlQueryStringGroupedBarPlot <- function(dataset, refArea, refPeriod) { # get
     }
 
     query <- paste0(query, "
-        } 
+        }
+    #ORDER BY ?refArea 
     ")
-#ORDER BY ?refArea 
+        
 
 
         q <- paste(prefixes, query)

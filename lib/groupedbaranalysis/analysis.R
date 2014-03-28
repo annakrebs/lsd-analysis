@@ -62,17 +62,7 @@ outputPlotGroupedBarPlot <- function(analysis) {
         }
         dataset <- ds # "dataset" -> vector which consists of all datasets in URI [2]http://worldbank.../../SE.XPD.PRIM.PC.ZS [3]http://worldbank.../../SE.XPD.SECO.PC.ZS 
 
-        # Generates refArea labels which will be used to label plot -> 'Switzerland'
-        r <- strsplit(c(r = analysis$refArea), ",")
-        rAL = ''
-        for (i in 1:length(r$r)) { # 1:length(r$r) = amount of refAreas
-            rA <- paste0(r$r[i])
-            rAL <- append(rAL, resourceLabels[rA]) 
-        }
-        refAreaLabel <- paste0(rAL[2:length(rAL)]) #refAreaLabel -> "" "Switzerland" "France"
-
-
-
+      
         if (is.null(analysis$meta$graph)) {
             plotPath <- paste0("plots/", analysis$id, ".svg") # creates path name of the plot
 
@@ -80,6 +70,14 @@ outputPlotGroupedBarPlot <- function(analysis) {
             if (!file.exists(paste0("www/", plotPath))) { 
         
                 data <- analysis$data
+
+                # Generates refArea labels which will be used to label plot -> 'Switzerland'
+                rAL = ''
+                for (i in 1:length(data$refArea)) { # data$refArea = amount of refAreas
+                    rA <- paste0(data$refArea[i])
+                    rAL <- append(rAL, resourceLabels[rA])
+                }
+                refAreaLabel <- paste0(rAL[2:length(rAL)]) #refAreaLabel ->  "" "France" "Switzerland"
 
                 # Loop through measureVariables to retrieve observation values and the measureVariables names
                 obsValues = ''
