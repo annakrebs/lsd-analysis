@@ -277,3 +277,8 @@ function getSelectedValues() {
 
 }
 
+function clearSelection() {
+    // TODO: just loads initial page, instead of just clearing the values
+    window.location.href = window.location.protocol + "//" + window.location.hostname + "/analysis/" + "dev/"
+}
+
