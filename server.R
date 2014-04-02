@@ -84,7 +84,7 @@ shinyServer(function(input, output, session) {
 
             #Grouped Bar Analysis
             case6={
-
+    
                 # datasets (datasets are split in sparql.R)
                 if (length(paths[4]) > 0) # checks if datasets exist in URI
                 {
