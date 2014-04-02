@@ -98,10 +98,6 @@ outputPlotGroupedBarPlot <- function(analysis) {
                     }
                 }
 
-                #TODO: if only one refArea exists in URI, for which no data exists, error message "object 'analysis' not found" appears. But if two refAreas exist is URI, for one of which data exists and for one of which no data exists, it shows a plot of BOTH refArea that both show the values of the refArea for which data exists
-                #TODO: e.g. worldbank:SE.XPD.PRIM.PC.ZS/JP/2009 and worldbank:SE.XPD.PRIM.PC.ZS/JP,FR/2009
-               
-
                 # Melts obsValues from CSV file into one column in a data frame, which is necessary to output a Grouped Bar Plot
                 df = data.frame(refArea=refAreaLabel, obsValues[2:length(obsValues)])
                 colnames(df) <- c("refArea", datasetLabel[2:length(datasetLabel)]) # names columns, which will be used for the plot
