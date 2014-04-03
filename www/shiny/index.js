@@ -124,36 +124,14 @@ $(document).ready(function(){
 // Grouped Bar Analysis functions
 
 
-
-
-
 // displays selected Reference Period
+$(function() {
+    $("#sliderRefPeriod").click( function() { // #sliderRefPeriod = id of slider in index.html
 
-
-
-/*$(function() {
-    $("#sliderRefPeriod").click( function() { // #select-dataset = id of button in index.html
-
-        alert("test");
-        var val = $('#sliderRefPeriod').slider("option", "value");
-        //var val = $("#sliderRefPeriod").slider("value");
-
-
-        //$("#sliderRefPeriod").val('value');
-        alert(val);
-        //document.getElementById("rP").innerHTML = refPeriod;
-
-        //var val = $("#sliderRefPeriod").slider('value'); // Get value
-        //alert(val);
-        //alert(document.getElementById("rP").innerHTML);
-        //document.getElementById("rP").innerHTML = refPeriod;
+        var refPeriod = $("#sliderRefPeriod").val(); // gets value of slider
+        document.getElementById("rP").innerHTML = refPeriod; // sets value of slider in text field 
     } );
-});*/
-
-
-function showRefPeriod(refPeriod) {
-    document.getElementById("rP").innerHTML = refPeriod;
-}
+});
 
 
 // adds datasets to "Selected Datasets" selection list
