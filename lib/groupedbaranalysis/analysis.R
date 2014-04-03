@@ -96,6 +96,7 @@ outputPlotGroupedBarPlot <- function(analysis) {
                         plotTitle <- paste(plotTitle, pT, sep=" and \n") # multiple datasets will be separated with an "and"
                     }
                 }
+                plotTitle <- paste0(plotTitle, " \n for Reference Period ", analysis$refPeriod) # adds refPeriod to plotTitle
 
                 # Melts obsValues from CSV file into one column in a data frame, which is necessary to output a Grouped Bar Plot
                 df = data.frame(refArea=refAreaLabel, obsValues[2:length(obsValues)])
