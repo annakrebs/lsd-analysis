@@ -9,7 +9,7 @@
  #                 Time Series Analysis. 
 
 getAnalysisGroupedBarPlot <- function(dataset, refArea, refPeriod, data) { 
-    id <- digest(paste0(dataset, refArea), algo="sha1", serialize=FALSE) 
+    id <- digest(paste0(dataset, refArea, refPeriod), algo="sha1", serialize=FALSE) # creates id based on datasets, refAreas & refPeriod
 
     write.csv(data, file=paste0("www/csv/", id, ".csv"))
 
@@ -68,7 +68,6 @@ outputPlotGroupedBarPlot <- function(analysis) {
 
             # Plot doesn't exists in directory
             if (!file.exists(paste0("www/", plotPath))) { 
-        
                 data <- analysis$data
 
                 # Generates refArea labels which will be used to label plot -> 'Switzerland'
