@@ -242,8 +242,16 @@ WHERE {
 
 
 sparqlQueryGroupedBarPlot <- function(dataset, refArea, refPeriod) { 
-    q <- sparqlQueryStringGroupedBarPlot(dataset, refArea, refPeriod)
-    r <- SPARQL(sparqlEndpoints$stats, q)
+    q <- sparqlQueryStringGroupedBarPlot(dataset, refArea, refPeriod) # q -> SPARQL query
+
+    cat(paste0("q: ", q), file=stderr()) # q contains SPARQL query with 5 datasets
+    cat(paste0("sparqlEndpoints$stats : ", sparqlEndpoints$stats), file=stderr()) # http://localhost.stats.270a.info/sparql
+
+    # TODO: problem with more than four datasets -> r doesn't get any value -> problem with SPARQL package
+    r <- SPARQL(sparqlEndpoints$stats, q) # TODO: Error occures here: r doesn't get value
+    cat(paste0("r: ", r), file=stderr())
+    cat(paste0("r$results: ", r$results), file=stderr())
+
     return(r$results)
 }
 
