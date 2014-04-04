@@ -51,28 +51,28 @@ sparqlUpdateGroupedBarPlot <- function(analysisURI, dataset, refArea, refPeriod,
     # Generates RDF triples of the data retrieved from the Grouped Bar Analysis results
     statsData <- paste0("<", analysisURI, ">")
     for (i in 1:length(data[, 1])) { 
-        statsData <- paste0(statsData, "
+        statsData <- str_trim(paste0(statsData, "
             stats:data [
                 a stats:DataRow ;
                 stats:refArea <", paste0(namespaces$wbcountry, data[i, 'refArea']), "> ;
  
-        ")
+        "))
 
         # Loop through measureVariables to retrieve observation values -> stats:measure "23.20144"^^xsd:decimal ;
         for (j in 2:length(data[1, ])) { # 2:length(data[1, ]) = amount of measureVariables 
-            statsData <- paste0(statsData, "
+            statsData <- str_trim(paste0(statsData, "
                 stats:measure \"", data[i, j], "\"^^xsd:decimal ;
-            ")
+            "))
         } # "data[i, 2]" -> is observation value (e.g. "23.20144") in first column of measureVariable (e.g. "abcdef")
-        statsData <- paste0(statsData, "
-            ] ;"
-        )
+        statsData <- str_trim(paste0(statsData, "
+            ] ;
+        "))
     }
 
     # Generates RDF triples of the data of the summary retrieved from the Grouped Bar Analysis results (e.g. min, q1, mean)
     statsSummary <- paste0("<", analysisURI, ">") # Abschnitt hinzugefügt
     for (i in 2:length(analysis$meta[, 1])) { # gets data from "meta" in "getAnalysisGroupedBarPlot" in analysis.R
-        statsSummary <- paste0(statsSummary, "
+        statsSummary <- str_trim(paste0(statsSummary, "
             stats:summary [
                 a stats:Summary ;
                 stats:dataset <", dataset[i], "> ;
@@ -82,12 +82,12 @@ sparqlUpdateGroupedBarPlot <- function(analysisURI, dataset, refArea, refPeriod,
                 stats:q3 \"", analysis$meta$q3Values[i], "\"^^xsd:decimal ;
                 stats:max \"", analysis$meta$maxValues[i], "\"^^xsd:decimal ;
                 stats:median \"", analysis$meta$medianValues[i], "\"^^xsd:decimal ;
-            ")       
+            "))       
 
-        statsSummary <- paste0(statsSummary, "            
+        statsSummary <- str_trim(paste0(statsSummary, "            
                 stats:n \"", analysis$meta[i, 'n'], "\"^^xsd:double
-            ] ;"
-        )
+            ] ;
+        "))
     }
 
 
@@ -128,22 +128,22 @@ INSERT DATA {
 
         # Loop through measureVariables to retrieve all dataset URIs -> prov:used <http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS> ;
         for (i in 2:length(data[1, ])) { # 2:length(data[1, ]) = amount of measureVariables
-            query <- paste0(query, "
+            query <- str_trim(paste0(query, "
                 prov:used <", dataset[i], "> ;
-            ")
+            "))
         }
         # Loop through obsValues to retrieve all refAreas names and adds namespace from World Bank in order to get URI of refArea
         for(i in 1:length(data[, 1])) { # 1:length(data[, 1]) = amount of obsValues
             if (i == 1) { #  URI of first refArea
-                query <- paste0(query, "
+                query <- str_trim(paste0(query, "
                     prov:used <", paste0(namespaces$wbcountry, data[i, 'refArea']), "> ;
-                ") 
+                ")) 
             }
             else { # URI of all the other refAreas
                 if (data[i-1, 'refArea'] != data[i, 'refArea']) { # checks whether same refArea has already been outputed -> only displays the same refArea once
-                    query <- paste0(query, "
+                    query <- str_trim(paste0(query, "
                         prov:used <", paste0(namespaces$wbcountry, data[i, 'refArea']), "> ;
-                    ") 
+                    ")) 
                 }
             } 
         }
@@ -171,22 +171,22 @@ INSERT DATA {
 
         # Loop through measureVariables to retrieve dataset URIs -> stats:dataset <http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS> ;
         for (i in 2:length(data[1, ])) { # 2:length(data[1, ]) = amount of measureVariables
-            query <- paste0(query, "
+            query <- str_trim(paste0(query, "
                 stats:dataset <", dataset[i], "> ;
-            ")
+            "))
         }
         # Loop through obsValues to retrieve all refAreas names and adds namespace from World Bank in order to get URI
         for(i in 1:length(data[, 1])) { # 1:length(data[, 1]) = amount of obsValues
             if (i == 1) { # URI of first refArea
-                query <- paste0(query, "
+                query <- str_trim(paste0(query, "
                     stats:refArea <", paste0(namespaces$wbcountry, data[i, 'refArea']), "> ;
-                ") 
+                ")) 
             }
             else { # URI of all the other refAreas
                 if (data[i-1, 'refArea'] != data[i, 'refArea']) { # checks whether same refArea has already been outputed -> only displays the same refArea once
-                    query <- paste0(query, "
+                    query <- str_trim(paste0(query, "
                         stats:refArea <", paste0(namespaces$wbcountry, data[i, 'refArea']), "> ;
-                    ") 
+                    ")) 
                 }
             } 
         }
