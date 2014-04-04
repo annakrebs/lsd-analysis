@@ -147,7 +147,7 @@ shinyServer(function(input, output, session) {
                 },
                 #Grouped Bar Analysis
                 case6={
-                    meta <- data.frame("n"= nrow(data), "minValues"=analysisSummary$minValues, "q1Values"=analysisSummary$q1Values, "meanValues"=analysisSummary$meanValues, "q3Values"=analysisSummary$q3Values, "maxValues"=analysisSummary$maxValues, "medianValues"=analysisSummary$medianValues, "graph"=analysisSummary$graph) 
+                    meta <- data.frame("n"= nrow(data), "minValues"=analysisSummary$minValues, "q1Values"=analysisSummary$q1Values, "medianValues"=analysisSummary$medianValues, "q3Values"=analysisSummary$q3Values, "maxValues"=analysisSummary$maxValues, "meanValues"=analysisSummary$meanValues, "graph"=analysisSummary$graph) 
 
                     analysis <- list("dataset"=dataset, "refArea"=refArea, "refPeriod"=refPeriod, "data"=data, "meta"=meta, "id"=id) 
                 },

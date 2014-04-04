@@ -15,29 +15,29 @@ getAnalysisGroupedBarPlot <- function(dataset, refArea, refPeriod, data) {
 
     minValues = ''
     q1Values = ''
-    meanValues = ''
+    medianValues = ''
     q3Values = ''
     maxValues = ''
-    medianValues = ''
+    meanValues = ''
     # Generates variables for the summary for each dataset
     for (i in 2:length(data[1, ])) { # 2:length(data[1, ]) = amount of measureVariables
         q <- quantile(data[ ,i])
         min <- q[1]
         q1 <- q[2]     
-        mean <- q[3]
+        median <- median(data[ ,i])
         q3 <- q[4]
         max <- q[5]
-        median <- median(data[ ,i])
+        mean <- mean(data[ ,i])
 
         minValues <- append(minValues, min)
         q1Values <- append(q1Values, q1)
-        meanValues <- append(meanValues, mean)
+        medianValues <- append(medianValues, median)
         q3Values <- append(q3Values, q3)
         maxValues <- append(maxValues, max)
-        medianValues <- append(medianValues, median)
+        meanValues <- append(meanValues, mean)
     } 
 
-    meta <- data.frame("n"= nrow(data), "minValues"=minValues, "q1Values"=q1Values, "meanValues"=meanValues, "q3Values"=q3Values, "maxValues"=maxValues, "medianValues"=medianValues) # creates data frame of values -> used for SPQRQL Update to store the results of the analysis in the Graph Store
+    meta <- data.frame("n"= nrow(data), "minValues"=minValues, "q1Values"=q1Values, "medianValues"=medianValues, "q3Values"=q3Values, "maxValues"=maxValues, "meanValues"=meanValues) # creates data frame of values -> used for SPQRQL Update to store the results of the analysis in the Graph Store
 
 
     return(list("dataset"=dataset, "refArea"=refArea, "refPeriod"=refPeriod, "data"=data, "meta"=meta, "id"=id))
@@ -164,16 +164,16 @@ outputAnalysisSummaryGroupedBarPlot <- function(analysis) {
         for (i in 2:length(data[1, ])) { # 2:length(data[1, ]) = amount of measureVariables        
             o <- HTML(paste0(o, "
                 <tr><td rowspan=4><a href=\"", dataset[i], "\">", datasetLabel[i] ,"</a></td>
-                    <th>Min</th><th>Q1</th><th>Mean</th>
+                    <th>Min</th><th>Q1</th><th>Median</th>
                 </tr>
                 <tr>
-                    <td>", analysis$meta$min[i], "</td><td>", analysis$meta$q1[i], "</td><td>", analysis$meta$mean[i], "</td>
+                    <td>", analysis$meta$min[i], "</td><td>", analysis$meta$q1[i], "</td><td>", analysis$meta$median[i], "</td>
                 </tr>
                 <tr>
-                    <th>Q3</th><th>Max</th><th>Median</th>
+                    <th>Q3</th><th>Max</th><th>Mean</th>
                 </tr>
                 <tr>
-                    <td>", analysis$meta$q3[i], "</td><td>", analysis$meta$max[i], "</td><td>", analysis$meta$median[i], "</td>
+                    <td>", analysis$meta$q3[i], "</td><td>", analysis$meta$max[i], "</td><td>", analysis$meta$mean[i], "</td>
                 </tr>
             "))
         }

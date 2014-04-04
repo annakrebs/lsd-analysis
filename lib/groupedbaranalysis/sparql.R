@@ -78,10 +78,10 @@ sparqlUpdateGroupedBarPlot <- function(analysisURI, dataset, refArea, refPeriod,
                 stats:dataset <", dataset[i], "> ;
                 stats:min \"", analysis$meta$minValues[i], "\"^^xsd:decimal ; 
                 stats:q1 \"", analysis$meta$q1Values[i], "\"^^xsd:decimal ;
-                stats:mean \"", analysis$meta$meanValues[i], "\"^^xsd:decimal ;
+                stats:median \"", analysis$meta$medianValues[i], "\"^^xsd:decimal ;
                 stats:q3 \"", analysis$meta$q3Values[i], "\"^^xsd:decimal ;
                 stats:max \"", analysis$meta$maxValues[i], "\"^^xsd:decimal ;
-                stats:median \"", analysis$meta$medianValues[i], "\"^^xsd:decimal ;
+                stats:mean \"", analysis$meta$meanValues[i], "\"^^xsd:decimal ;
             "))       
 
         statsSummary <- str_trim(paste0(statsSummary, "            
