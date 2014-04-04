@@ -7,7 +7,22 @@
 
 // sets values in input fields when page is loaded 
 $(document).ready(function(){
-     var href = window.location.href.match(new RegExp(window.location.protocol + "\/\/" + window.location.hostname + "\/analysis/dev\/([^\/]*)\/([^\/]*)\/([^\.]*).html")); // gets URI
+
+    // sets title of datasets to same as text of datasets in "Datasets" selection list
+    var d = document.getElementById("datasets"); // gets all datasets of the "Datasets" selection list
+    for (var i=0; i < d.length; i++) {
+        d.options[i].title = d.options[i].text;
+    }
+
+    // sets title of refAreas to same as text of refAreas in "Reference Area" selection list
+    var r = document.getElementById("refAreas"); // gets all refAreas of the "Reference Areas" selection list
+    for (var i=0; i < r.length; i++) {
+        r.options[i].title = r.options[i].text;
+    }
+
+    // gets URI
+     var href = window.location.href.match(new RegExp(window.location.protocol + "\/\/" + window.location.hostname + "\/analysis/dev\/([^\/]*)\/([^\/]*)\/([^\.]*).html")); 
+
 
     if(href != null) { // URI contains analysis elements
         switch(href.length) {
@@ -62,10 +77,16 @@ $(document).ready(function(){
 
                     var option = document.createElement("option");
                     option.text = datsetText; // -> "Expenditure per student, primary (% of GDP per capita)"
+                    option.title = datsetText; // -> "Expenditure per student, primary (% of GDP per capita)"
                     option.value = dataset; // -> "http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS"
                     selectedDatasets.add(option); // adds the text of the URI datasets to selection list "Selected Datasets"
 
                     $("#datasets option:selected").remove(); // removes the text of the URI datasets from selection list "Datasets"
+                }
+                // sets title of datasets to same as text of datasets in "selectedDatasets" selection list
+                var ds = document.getElementById("selectedDatasets"); // gets all datasets of the "Datasets" selection list
+                for (var i=0; i < ds.length; i++) {
+                    ds.options[i].title = ds.options[i].text;
                 }
 
                 // sets values of "Reference Areas" & "Selected Reference Areas" selection lists according to values in URI
@@ -80,10 +101,16 @@ $(document).ready(function(){
 
                     var option = document.createElement("option");
                     option.text = refAreaText; // -> "Switzerland"
+                    option.title = refAreaText; // -> "Switzerland"
                     option.value = refArea; // -> "http://worldbank.270a.info/classification/country/CH"
                     selectedRefAreas.add(option); // adds the text of the URI refAreas to selection list "Selected Reference Areas"
 
                     $("#refAreas option:selected").remove(); // removes the text of the URI refAreas from selection list "Reference Areas"
+                }
+                // sets title of refAreas to same as text of refAreas in "selectedRefAreas" selection list
+                var rs = document.getElementById("selectedDatasets"); // gets all refAreas of the "Selected Reference Area" selection list
+                for (var i=0; i < rs.length; i++) {
+                    rs.options[i].title = rs.options[i].text;
                 }
                 
                 // sets "Reference Period" slider & text according to value in URI
@@ -148,6 +175,7 @@ $(function() {
             if(datasets.options[i].selected == true) {
                 var option = document.createElement("option");
                 option.text = datasets.options[i].text; // text of selected dataset -> "Expenditure per student, primary (% of GDP per capita)"
+                option.title = datasets.options[i].title; // title of selected dataset -> "Expenditure per student, primary (% of GDP per capita)"
                 option.value = datasets.options[i].value; // value of selected dataset -> "http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS"
                 selectedDatasets.add(option); // adds the text of the selected dataset to selection list "Selected Datasets"
             }
@@ -178,6 +206,7 @@ $(function() {
             if(selectedDatasets.options[i].selected == true) {
                 var option = document.createElement("option");
                 option.text = selectedDatasets.options[i].text; // text of selected dataset -> "Expenditure per student, primary (% of GDP per capita)"
+                option.title = selectedDatasets.options[i].title; // title of selected dataset -> "Expenditure per student, primary (% of GDP per capita)
                 option.value = selectedDatasets.options[i].value; // value of selected dataset -> "http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS"
                 datasets.add(option); // adds the text of the selected dataset to selection list "Datasets"
             }
@@ -208,6 +237,7 @@ $(function() {
             if(refAreas.options[i].selected == true) {
                 var option = document.createElement("option");
                 option.text = refAreas.options[i].text; // text of selected refArea -> "Switzerland"
+                option.title = refAreas.options[i].title; // title of selected refArea -> "Switzerland"
                 option.value = refAreas.options[i].value; // value of selected refArea -> "http://worldbank.270a.info/classification/country/CH"
                 selectedRefAreas.add(option); // adds the text and the value of the selected dataset to selection list "Selected Datasets"
             }
@@ -238,6 +268,7 @@ $(function() {
             if(selectedRefAreas.options[i].selected == true) {
                 var option = document.createElement("option");
                 option.text = selectedRefAreas.options[i].text; // text of selected refArea -> "Switzerland"
+                option.title = selectedRefAreas.options[i].title; // title of selected refArea -> "Switzerland"
                 option.value = selectedRefAreas.options[i].value; // value of selected refArea -> "http://worldbank.270a.info/classification/country/CH"
                 refAreas.add(option); // adds the text of the selected dataset to selection list "Selected Datasets"
             }
