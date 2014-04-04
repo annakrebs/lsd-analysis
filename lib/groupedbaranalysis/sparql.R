@@ -190,18 +190,8 @@ INSERT DATA {
             } 
         }
 
-        # TODO: shows values appropriately?
-        for (i in 2:length(analysis$meta[, 1])) { # gets data from "meta" in "getAnalysisGroupedBarPlot" in analysis.R
-            query <- paste0(query, "                         
-                stats:min \"", analysis$meta$minValues[i], "\"^^xsd:decimal ; 
-                stats:q1 \"", analysis$meta$q1Values[i], "\"^^xsd:decimal ;
-                stats:mean \"", analysis$meta$meanValues[i], "\"^^xsd:decimal ;
-                stats:q3 \"", analysis$meta$q3Values[i], "\"^^xsd:decimal ;
-                stats:max \"", analysis$meta$maxValues[i], "\"^^xsd:decimal ;
-                stats:median \"", analysis$meta$medianValues[i], "\"^^xsd:decimal ;
-                ")
-        }
         query <- paste0(query, "
+        stats:refPeriod <", paste0(namespaces$year, refPeriod), "> ;
         stats:n \"", nrow(data), "\"^^xsd:integer
 
         .
@@ -233,30 +223,16 @@ WHERE {
         <", analysisURI, ">
             stats:dataset ?dataset ; 
             stats:refArea ?refArea ;
+            stats:refPeriod ?refPeriod;
             stats:graph ?graph ;
-            stats:n ?n ;
-            stats:min ?min ;
-            stats:q1 ?q1 ;
-            stats:mean ?mean ;
-            stats:q3 ?q3 ;
-            stats:max ?max ;
-            stats:median ?median  
+            stats:n ?n 
+
  
     }
 }
 ");
 
-            #stats:dataset ?dataset ; 
-            #stats:refArea ?refArea ; 
-            #stats:refPeriod ?refPeriod ;
-            #stats:graph ?graph ;
-            #stats:n ?n ;
-            #stats:minValues ?minValues ;
-            #stats:q1Values ?q1Values ;
-            #stats:meanValues ?meanValues ;
-            #stats:q3Values ?q3Values ;
-            #stats:maxValues ?maxValues ;
-            #stats:medianValues ?medianValues 
+
 
     r <- SPARQL(sparqlServiceQueryURI, q)
     return(r$results)
