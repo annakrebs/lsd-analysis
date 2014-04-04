@@ -258,44 +258,69 @@ $(function() {
 $(function() {
     $("#analyze").click( function() { // #analyze = id of button in index.html
 
-        // concatenates datasets for URI -> 'worldbank:SE.XPD.PRIM.PC.ZS,worldbank:SE.XPD.SECO.PC.ZS'
-        var selectedDatasets = document.getElementById("selectedDatasets");
-        var datasetsString = "";
-        var i;
-        for (i = 0; i < selectedDatasets.length; i++) { // concatenates all selected datasets to use in URI
-            var dataset = selectedDatasets[i].value;
-            var ds = dataset.split("270a.info/dataset/").pop(); // splits string after dataset -> only gets 'SE.XPD.PRIM.PC.ZS' 
+    var errorMessage = "Please select at least one ";
 
-            var p = dataset.split("http://").pop(); // cuts off 'http://' at the beginning of the string
-            var prefix = p.split(".270a.info/dataset/").shift(); // splits string before prefix -> only gets 'worldbank'
+        // checks if at least one dataset was selected
+        if( $('#selectedDatasets').has('option').length > 0 ) {
+            // concatenates datasets for URI -> 'worldbank:SE.XPD.PRIM.PC.ZS,worldbank:SE.XPD.SECO.PC.ZS'
+            var selectedDatasets = document.getElementById("selectedDatasets");
+            var datasetsString = "";
+            var i;
+            for (i = 0; i < selectedDatasets.length; i++) { // concatenates all selected datasets to use in URI
+                var dataset = selectedDatasets[i].value;
+                var ds = dataset.split("270a.info/dataset/").pop(); // splits string after dataset -> only gets 'SE.XPD.PRIM.PC.ZS' 
 
-            if(i == selectedDatasets.length - 1) { // concatenates prefix & dataset -> worldbank:SE.XPD.PRIM.PC.ZS
-                datasetsString = datasetsString + prefix + ":" + ds // doesn't set "," after last dataset value
+                var p = dataset.split("http://").pop(); // cuts off 'http://' at the beginning of the string
+                var prefix = p.split(".270a.info/dataset/").shift(); // splits string before prefix -> only gets 'worldbank'
+
+                if(i == selectedDatasets.length - 1) { // concatenates prefix & dataset -> worldbank:SE.XPD.PRIM.PC.ZS
+                    datasetsString = datasetsString + prefix + ":" + ds // doesn't set "," after last dataset value
+                }
+                else
+                    datasetsString = datasetsString + prefix + ":" + ds + ","; // separates refAreas with ","
             }
-            else
-                datasetsString = datasetsString + prefix + ":" + ds + ","; // separates refAreas with ","
+        }
+        else {
+            var errorMessage = errorMessage + "Dataset "; // no dataset was selected
         }
 
-        // concatenates refArea for URI -> 'CH,US'
-        var selectedRefAreas = document.getElementById("selectedRefAreas");
-        var refAreasString = "";
-        var i;
-        for (i = 0; i < selectedRefAreas.length; i++) { // concatenates all selected refAreas to use in URI
-            var refArea = selectedRefAreas[i].value;
-            var rA = refArea.split("270a.info/classification/country/").pop(); // splits string after country -> only gets 'CH' 
 
-            if(i == selectedRefAreas.length - 1) {
-                refAreasString = refAreasString + rA // doesn't set "," after last refArea value
+        if( $('#selectedRefAreas').has('option').length > 0 ) { // checks if at least one refArea was selected
+            // concatenates refArea for URI -> 'CH,US'
+            var selectedRefAreas = document.getElementById("selectedRefAreas");
+            var refAreasString = "";
+            var i;
+            for (i = 0; i < selectedRefAreas.length; i++) { // concatenates all selected refAreas to use in URI
+                var refArea = selectedRefAreas[i].value;
+                var rA = refArea.split("270a.info/classification/country/").pop(); // splits string after country -> only gets 'CH' 
+
+                if(i == selectedRefAreas.length - 1) {
+                    refAreasString = refAreasString + rA // doesn't set "," after last refArea value
+                }
+                else
+                    refAreasString = refAreasString + rA + ","; // separates refAreas with ","
             }
-            else
-                refAreasString = refAreasString + rA + ","; // separates refAreas with ","
+        }
+        else {
+            if( $('#selectedDatasets').has('option').length > 0 ) { // checks if dataset was selected
+                var errorMessage = errorMessage + "Reference Area "; // no refArea was selected
+            }
+            else {
+                var errorMessage = errorMessage + "and Reference Area "; // no dataset and no refArea were selected
+            }
         }
 
         // refPeriod for URI
         var refPeriodString = document.getElementById("rP").innerHTML;
 
-        // concatenates URI
-        window.location.href = window.location.protocol + "//" + window.location.hostname + "/analysis/" + "dev/" + datasetsString + "/" + refAreasString + "/" + refPeriodString;
+
+        if( $('#selectedRefAreas').has('option').length > 0 && $('#selectedDatasets').has('option').length > 0) {
+            // concatenates URI
+            window.location.href = window.location.protocol + "//" + window.location.hostname + "/analysis/" + "dev/" + datasetsString + "/" + refAreasString + "/" + refPeriodString;
+        }
+        else {
+            alert(errorMessage);
+        }
 
     } );
 });
