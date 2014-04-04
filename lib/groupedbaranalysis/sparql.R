@@ -114,11 +114,11 @@ sparqlUpdateGroupedBarPlot <- function(analysisURI, dataset, refArea, refPeriod,
 INSERT DATA {
     GRAPH <http://stats.270a.info/graph/analysis> {
         ", sparqlQueryURI, "
-            rdfs:label \"SPARQL Query URI to retrieve the data for '", rL, "'\"@en .
+            rdfs:label \"SPARQL Query URI to retrieve the data for '", rL, "' for ", refPeriod, "\"@en .
 
         provenance:", analysis$id, "
             a prov:Activity ;
-            rdfs:label \"Generated Analysis '", rL, "'\"@en ;
+            rdfs:label \"Generated Analysis '", rL, "' for ", refPeriod, "\"@en ;
 
             prov:startedAtTime \"", now, "\"^^xsd:dateTime ;
             prov:wasAssociatedWith <http://csarven.ca/#i> ;
@@ -148,7 +148,8 @@ INSERT DATA {
             } 
         }
 
-        query <- paste0(query, "  
+        query <- paste0(query, "
+            prov:used <", paste0(namespaces$year, refPeriod), "> ;  
             prov:generated <", analysisURI, "> ;
             dcterms:license <", licenseURI, ">
         .
@@ -156,7 +157,7 @@ INSERT DATA {
         <", analysisURI, ">
             a stats:Analysis ;
             a prov:Entity ;        
-            rdfs:label \"Analysis of '", rL, "'\"@en ;
+            rdfs:label \"Analysis of '", rL, "' for ", refPeriod, "\"@en ;
 
             prov:wasGeneratedBy provenance:", analysis$id, " ;
             prov:generatedAtTime \"", now, "\"^^xsd:dateTime ;
