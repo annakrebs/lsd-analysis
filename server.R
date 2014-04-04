@@ -5,6 +5,7 @@ library(SPARQL)
 library(digest)
 library(gridSVG)
 library(reshape2)
+library(stringr)
 
 urlProtocol <- ''
 urlHostname <- ''
