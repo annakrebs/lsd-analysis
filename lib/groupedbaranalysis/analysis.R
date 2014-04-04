@@ -104,7 +104,7 @@ outputPlotGroupedBarPlot <- function(analysis) {
                 plotData <- melt(df, id=c(df$refArea), id.vars=1) # melts data frame in appropriate form, so it can be used for Grouped Bar Plot
 
                 # Creates Grouped Bar Plot
-                g <- ggplot(plotData, environment = environment(), aes(x=refArea, y=value, fill=variable)) + geom_bar(stat="identity", position="dodge") + labs(list(x="Reference Area", y="Value", fill="Datasets", title=plotTitle)) + theme(legend.position="bottom") + geom_text(aes(label=value), position=position_dodge(width=0.9), vjust=-0.25)
+                g <- ggplot(plotData, environment = environment(), aes(x=refArea, y=value, fill=variable)) + geom_bar(stat="identity", position="dodge") + labs(list(x="Reference Area", y="Value", fill="Datasets", title=plotTitle)) + theme(legend.position="bottom", legend.direction="vertical", plot.title=element_text(size=13)) + geom_text(aes(label=value), position=position_dodge(width=0.9), vjust=-0.25)
 
                 # TODO: Creates Stacked Plot
                 #g <- ggplot(plotData, environment = environment(), aes(x=refArea, y=value, fill=variable)) + geom_bar(stat="identity", position="stack") + labs(list(x="Reference Area", y="Value", fill="Datasets", title=plotTitle)) + theme(legend.position="bottom") + geom_text(aes(label=value), position=position_dodge(width=0.9), vjust=-0.25)
