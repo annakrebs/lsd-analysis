@@ -11,8 +11,9 @@ $(document).ready(function(){
     // sets title of datasets to same as text of datasets in "Datasets" selection list
     var d = document.getElementById("datasets"); // gets all datasets of the "Datasets" selection list
     for (var i=0; i < d.length; i++) {
-        d.options[i].title = d.options[i].text;
+        d.options[i].title = d.options[i].text
     }
+
 
     // sets title of refAreas to same as text of refAreas in "Reference Area" selection list
     var r = document.getElementById("refAreas"); // gets all refAreas of the "Reference Areas" selection list
@@ -73,11 +74,36 @@ $(document).ready(function(){
 
                     var dataset = "http://" + domain + ".270a.info/dataset/" + d
                     $("#datasets").val(dataset); // selects values of URI in "Datasets" selection list -> $("#datasets") = id of select in html
-                    var datsetText = $("#datasets option:selected").html(); // gets text of selected dataset -> "Expenditure per student, primary (% of GDP per capita)"
-
+                    var datsetText = $("#datasets option:selected"); // gets text of selected dataset -> "Expenditure per student, primary (% of GDP per capita)"
+                    var ds = document.getElementById("datasets");
                     var option = document.createElement("option");
-                    option.text = datsetText; // -> "Expenditure per student, primary (% of GDP per capita)"
-                    option.title = datsetText; // -> "Expenditure per student, primary (% of GDP per capita)"
+
+                    // sets optgroup label according to prefix in URI
+                    switch(domain) {
+                        case "worldbank":
+                            option.label = "World Bank"; // -> "World Bank"
+                            break;
+                        case "ecb":
+                            option.label = "European Central Bank";
+                            break;
+                        case "fao":
+                            option.label = "Food and Agriculture Organization of the United Nations";
+                            break;
+                        case "oecd":
+                            option.label = "Organisation for Economic Co-operation and Development";
+                            break;
+                        case "imf":
+                            option.label = "International Monetary Fund";
+                            break;
+                        case "transparency":
+                            option.label = "Transparency International";
+                            break;
+                        default:
+                            break;
+                    }
+
+                    option.text = datsetText.html(); // -> "Expenditure per student, primary (% of GDP per capita)"
+                    option.title = datsetText.html(); // -> "Expenditure per student, primary (% of GDP per capita)"
                     option.value = dataset; // -> "http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS"
                     selectedDatasets.add(option); // adds the text of the URI datasets to selection list "Selected Datasets"
 
@@ -165,7 +191,7 @@ $(function() {
 $(function() {
     $("#select-dataset").click( function() { // #select-dataset = id of button in index.html
 
-        // TODO: adds selected dataset at end of selection list and not at appropriate position
+        // TODO: adds selected dataset at end of appropriate optgroup in selection list but not at appropriate alphabetical position
 
         var selectedDatasets = document.getElementById("selectedDatasets");
         var datasets = document.getElementById("datasets"); // gets the selected dataset of the "Datasets" selection list
@@ -174,10 +200,13 @@ $(function() {
         for (var i = 0; i < datasets.options.length; i++) {
             if(datasets.options[i].selected == true) {
                 var option = document.createElement("option");
+                option.label = $(datasets.options[i]).closest('optgroup').prop('label'); // label of optgroup of selected dataset -> "World Bank"
                 option.text = datasets.options[i].text; // text of selected dataset -> "Expenditure per student, primary (% of GDP per capita)"
                 option.title = datasets.options[i].title; // title of selected dataset -> "Expenditure per student, primary (% of GDP per capita)"
                 option.value = datasets.options[i].value; // value of selected dataset -> "http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS"
-                selectedDatasets.add(option); // adds the text of the selected dataset to selection list "Selected Datasets"
+
+                selectedDatasets.appendChild(option); // adds the text of the selected dataset to selection list "Selected Datasets"
+                //selectedDatasets.add(option); // adds the text of the selected dataset to selection list "Selected Datasets"
             }
         }
 
@@ -205,10 +234,20 @@ $(function() {
         for (var i = 0; i < selectedDatasets.options.length; i++) {
             if(selectedDatasets.options[i].selected == true) {
                 var option = document.createElement("option");
+                option.label = selectedDatasets.options[i].label; // label of optgroup of selected dataset -> "World Bank"
                 option.text = selectedDatasets.options[i].text; // text of selected dataset -> "Expenditure per student, primary (% of GDP per capita)"
                 option.title = selectedDatasets.options[i].title; // title of selected dataset -> "Expenditure per student, primary (% of GDP per capita)
                 option.value = selectedDatasets.options[i].value; // value of selected dataset -> "http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS"
-                datasets.add(option); // adds the text of the selected dataset to selection list "Datasets"
+                
+                // adds selected datasets from "Selected Dataset" to appropriate optgroup in the "Datasets" selection list
+                var optgroups = datasets.getElementsByTagName('optgroup');
+                for (var j = 0; optgroups.length; j++) {    
+                    if (option.label == optgroups[j].label)
+                    {
+                        optgroups[j].appendChild(option); // adds option to optgroup
+                        break;
+                    }
+                }   
             }
         }
 
