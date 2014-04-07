@@ -21,6 +21,15 @@ $(document).ready(function(){
         r.options[i].title = r.options[i].text;
     }
 
+    // sorts "Reference Areas" selection list by text
+    var sortOptions = $("#refAreas option");
+    sortOptions.sort(function(a,b) {
+        if (a.text > b.text) return 1;
+        else if (a.text < b.text) return -1;
+        else return 0
+    })
+    $("#refAreas").empty().append(sortOptions);
+
     // gets URI
      var href = window.location.href.match(new RegExp(window.location.protocol + "\/\/" + window.location.hostname + "\/analysis/dev\/([^\/]*)\/([^\/]*)\/([^\.]*).html")); 
 
@@ -74,7 +83,7 @@ $(document).ready(function(){
 
                     var dataset = "http://" + domain + ".270a.info/dataset/" + d
                     $("#datasets").val(dataset); // selects values of URI in "Datasets" selection list -> $("#datasets") = id of select in html
-                    var datsetText = $("#datasets option:selected"); // gets text of selected dataset -> "Expenditure per student, primary (% of GDP per capita)"
+                    var datsetText = $("#datasets option:selected").html(); // gets text of selected dataset -> "Expenditure per student, primary (% of GDP per capita)"
                     var ds = document.getElementById("datasets");
                     var option = document.createElement("option");
 
@@ -102,8 +111,8 @@ $(document).ready(function(){
                             break;
                     }
 
-                    option.text = datsetText.html(); // -> "Expenditure per student, primary (% of GDP per capita)"
-                    option.title = datsetText.html(); // -> "Expenditure per student, primary (% of GDP per capita)"
+                    option.text = datsetText; // -> "Expenditure per student, primary (% of GDP per capita)"
+                    option.title = datsetText; // -> "Expenditure per student, primary (% of GDP per capita)"
                     option.value = dataset; // -> "http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS"
                     selectedDatasets.add(option); // adds the text of the URI datasets to selection list "Selected Datasets"
 
@@ -191,8 +200,6 @@ $(function() {
 $(function() {
     $("#select-dataset").click( function() { // #select-dataset = id of button in index.html
 
-        // TODO: adds selected dataset at end of appropriate optgroup in selection list but not at appropriate alphabetical position
-
         var selectedDatasets = document.getElementById("selectedDatasets");
         var datasets = document.getElementById("datasets"); // gets the selected dataset of the "Datasets" selection list
 
@@ -206,7 +213,6 @@ $(function() {
                 option.value = datasets.options[i].value; // value of selected dataset -> "http://worldbank.270a.info/dataset/SE.XPD.PRIM.PC.ZS"
 
                 selectedDatasets.appendChild(option); // adds the text of the selected dataset to selection list "Selected Datasets"
-                //selectedDatasets.add(option); // adds the text of the selected dataset to selection list "Selected Datasets"
             }
         }
 
@@ -217,6 +223,15 @@ $(function() {
             }
         }
 
+        // sorts "Selected Dataset" selection list by text
+        var sortOptions = $("#selectedDatasets option");
+        sortOptions.sort(function(a,b) {
+            if (a.text > b.text) return 1;
+            else if (a.text < b.text) return -1;
+            else return 0
+        })
+        $("#selectedDatasets").empty().append(sortOptions);
+
     } );
 });
 
@@ -224,8 +239,6 @@ $(function() {
 // removes datasets from "Selected Datasets" selection list
 $(function() {
     $("#deselect-dataset").click( function() { // #deselect-dataset = id of button in index.html
-
-        // TODO: adds deselected dataset at end of selection list and not at the original position
 
         var datasets = document.getElementById("datasets");
         var selectedDatasets = document.getElementById("selectedDatasets"); // gets the selected dataset of the "Selected Datasets" selection list
@@ -258,6 +271,20 @@ $(function() {
             }
         }
 
+        // sorts options in "Dataset" selection list within optgroup by text
+        $(function(){
+            $('optgroup').each(function(){
+                var 
+                optgroup=$(this),
+                    options=optgroup.children().toArray().sort(function(a,b){
+                        return $(a).text()<$(b).text() ? 1 : -1
+                    })
+                    $.each(options,function(i,v){
+                        optgroup.prepend(v)
+                    })
+                })
+            })
+
     } );
 });
 
@@ -265,8 +292,6 @@ $(function() {
 // adds refAreas to "Selected Reference Areas" selection list
 $(function() {
     $("#select-refArea").click( function() { // #select-refArea = id of button in index.html
-
-        // TODO: adds deselected refAreas at end of selection list and not at the original position
 
         var selectedRefAreas = document.getElementById("selectedRefAreas");
         var refAreas = document.getElementById("refAreas"); // gets the selected refArea of the "Reference Area" selection list
@@ -289,6 +314,15 @@ $(function() {
             }
         }
 
+        // sorts "Selected Reference Areas" selection list by text
+        var sortOptions = $("#selectedRefAreas option");
+        sortOptions.sort(function(a,b) {
+            if (a.text > b.text) return 1;
+            else if (a.text < b.text) return -1;
+            else return 0
+        })
+        $("#selectedRefAreas").empty().append(sortOptions);
+
     } );
 });
 
@@ -296,8 +330,6 @@ $(function() {
 // removes refAreas from "Selected Reference Areas" selection list
 $(function() {
     $("#deselect-refArea").click( function() { // #deselect-refArea = id of button in index.html
-
-        // TODO: adds selected dataset at end of selection list and not at appropriate position
 
         var refAreas = document.getElementById("refAreas");
         var selectedRefAreas = document.getElementById("selectedRefAreas"); // gets the selected refArea of the "Reference Area" selection list
@@ -319,6 +351,15 @@ $(function() {
                 selectedRefAreas.remove(i);
             }
         }
+
+        // sorts "Reference Areas" selection list by text
+        var sortOptions = $("#refAreas option");
+        sortOptions.sort(function(a,b) {
+            if (a.text > b.text) return 1;
+            else if (a.text < b.text) return -1;
+            else return 0
+        })
+        $("#refAreas").empty().append(sortOptions);
 
     } );
 });
