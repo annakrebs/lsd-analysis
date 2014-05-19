@@ -1,0 +1,69 @@
+/** 
+ * 
+ * @author    Anna-Barbara Krebs
+ * 
+ * Grouped Bar Analysis CSS
+ */
+
+form label {
+font-weight:bold;
+display: block;
+}
+
+.selection-list {
+width: 100%;
+height: 150px;
+/*overflow-x: scroll;*/
+
+}
+
+.btn-select {
+text-align:center;
+width: 50px;
+padding:4px;
+margin-bottom:18px;
+} 
+
+#reset, #clear {
+padding:4px;
+margin-bottom:18px;
+} 
+
+#sliderRefPeriod {
+width: 100%;
+}
+
+#rP {
+position:absolute;
+left:154px;
+
+}
+
+
+#form_analysis optgroup {
+font-size:100%; 
+margin-top:11px;
+}
+
+#plot {
+float:left;
+/*width:45%;*/
+margin-bottom:2.5em;
+}
+
+#statsSummary { 
+float:left;
+width:60%;
+margin-bottom:2.5em;
+/*clear:both;
+float:right;
+margin-left:33.5%;
+width:40%;*/
+}
+
+#lsd-analysis-results,
+#lsd-analysis-results-quantile { 
+margin-bottom:18px;
+width:100%;
+font-size:1em; 
+}
